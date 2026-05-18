@@ -417,7 +417,11 @@ function SupporterTracker({ onSwitch }) {
     fetch(SCRIPT_URL + "?type=checkpoints")
       .then(r => r.json())
       .then(data => {
-        if (data.checkpoints?.length > 1) setCheckpoints(data.checkpoints.slice(1).map(r => ({ timestamp: r[0], naam: r[2], km: parseFloat(r[3]) || 0 })));
+        if (data.checkpoints?.length > 1) {
+          setCheckpoints(data.checkpoints.slice(1).map(r => ({ timestamp: r[0], naam: r[2], km: parseFloat(r[3]) || 0 })));
+        } else {
+          setCheckpoints([]);
+        }
         setLastUpdate(new Date());
       }).catch(() => {});
   }
