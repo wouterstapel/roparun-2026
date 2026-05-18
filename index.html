@@ -482,7 +482,7 @@ function SupporterTracker({ onSwitch }) {
           { val: `${huidigKm}`, sub: `/${TOTAL_KM}km`, lbl: "Afstand" },
           { val: `${snelheid.toFixed(1)}`, sub: "km/h", lbl: "Snelheid" },
           { val: formatDuur(looptijdMs), sub: "", lbl: "Onderweg" },
-          { val: formatEta(calcEtaMs(huidigKm, TOTAL_KM, snelheid)) || "—", sub: "finish", lbl: "ETA" },
+          { val: checkpoints.length > 0 ? (formatEta(calcEtaMs(huidigKm, TOTAL_KM, snelheid)) || "—") : "ma ~14:24", sub: "finish", lbl: "ETA" },
         ].map((s, i) => (
           <div key={i} style={{ background: "#1a2530", borderRadius: 12, padding: "10px 8px", textAlign: "center" }}>
             <div style={{ fontSize: i === 2 ? 12 : 15, fontWeight: 700, lineHeight: 1.2 }}>{s.val}</div>
@@ -503,7 +503,7 @@ function SupporterTracker({ onSwitch }) {
           <div style={{ background: "#1a2530", borderRadius: 12, padding: "12px 14px" }}>
             <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 3 }}>🎯 Volgend WP</div>
             <div style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.3 }}>{volgendWP.naam.split("–").pop()?.trim()}</div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>{formatEta(calcEtaMs(huidigKm, volgendWP.km, snelheid)) || volgendWP.tijd}</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>{checkpoints.length > 0 ? (formatEta(calcEtaMs(huidigKm, volgendWP.km, snelheid)) || volgendWP.tijd) : volgendWP.tijd}</div>
           </div>
         )}
       </div>
@@ -528,7 +528,7 @@ function SupporterTracker({ onSwitch }) {
             const gepasseerd = checkpoints.length > 0 && p.km <= huidigKm;
             const isNu = p.km === huidigPunt.km;
             const werkelijk = checkpoints.find(c => c.naam === p.naam);
-            const eta = !gepasseerd ? formatEta(calcEtaMs(huidigKm, p.km, snelheid)) : null;
+            const eta = checkpoints.length > 0 && !gepasseerd ? formatEta(calcEtaMs(huidigKm, p.km, snelheid)) : null;
             return (
               <div key={i} style={{ padding: isWP ? "13px 16px" : "8px 16px", borderBottom: i < zichtbaar.length-1 ? `1px solid rgba(255,255,255,${isWP?"0.08":"0.04"})` : "none", display: "flex", alignItems: "center", gap: 10, background: isNu ? "rgba(74,222,128,0.06)" : isWP ? "rgba(255,255,255,0.01)" : "transparent" }}>
                 <div style={{ width: isWP ? 28 : 18, height: isWP ? 28 : 18, borderRadius: "50%", flexShrink: 0, background: gepasseerd ? (isWP ? "#16a34a" : "rgba(74,222,128,0.15)") : "#1e3a2e", border: isNu ? `2px solid ${s.kleur}` : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: isWP ? 12 : 9 }}>
