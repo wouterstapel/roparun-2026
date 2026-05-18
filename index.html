@@ -525,7 +525,7 @@ function SupporterTracker({ onSwitch }) {
           {zichtbaar.map((p, i) => {
             const s = STIJL[p.type];
             const isWP = ["start","wp","finish"].includes(p.type);
-            const gepasseerd = p.km <= huidigKm;
+            const gepasseerd = checkpoints.length > 0 && p.km <= huidigKm;
             const isNu = p.km === huidigPunt.km;
             const werkelijk = checkpoints.find(c => c.naam === p.naam);
             const eta = !gepasseerd ? formatEta(calcEtaMs(huidigKm, p.km, snelheid)) : null;
