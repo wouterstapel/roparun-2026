@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="Roparun 2026"/>
+<title>Roparun 2026 – HW-Runners</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: #0f1923; }
+  #root { max-width: 430px; margin: 0 auto; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvSVgpQbon1axHL_5se9l8UslwDuRM9DjJMfLSx_sV0AaCkBUvS0Pgk4ZAsJSZLI_H/exec";
+const TEAM_PIN = "2026";
+
+const ROUTE = [
+  { km: 0,     naam: "START – Circuit La Clef des Champs", type: "start", tijd: "za 13:10" },
+  { km: 1.8,   naam: "Clastres", type: "door" },
+  { km: 8.4,   naam: "Einde RBR Clastres", type: "rbr" },
+  { km: 8.5,   naam: "Essigny-le-Grand", type: "door" },
+  { km: 11.4,  naam: "Urvillers", type: "door" },
+  { km: 12.8,  naam: "Begin RBR Urvillers (0,5 km)", type: "rbr" },
+  { km: 14.7,  naam: "Itancourt", type: "door" },
+  { km: 17.2,  naam: "Neuville-Saint-Amand", type: "door" },
+  { km: 18.9,  naam: "Mesnil-Saint-Laurent", type: "door" },
+  { km: 19.7,  naam: "Toilet Mesnil-Saint-Laurent", type: "toilet" },
+  { km: 22.3,  naam: "Homblières", type: "door" },
+  { km: 28.2,  naam: "Essigny-le-Petit", type: "door" },
+  { km: 31.0,  naam: "Fontaine-Uterte", type: "door" },
+  { km: 36.1,  naam: "Montbrehain", type: "door" },
+  { km: 38.2,  naam: "Toilet Brancourt-le-Grand", type: "toilet" },
+  { km: 38.5,  naam: "CP02 Brancourt-le-Grand", type: "cp" },
+  { km: 38.6,  naam: "Brancourt-le-Grand", type: "door" },
+  { km: 43.9,  naam: "Bohain-en-Vermandois", type: "door" },
+  { km: 44.0,  naam: "WP01 – Bohain-en-Vermandois", type: "wp", tijd: "za 17:10", team: "A→B" },
+  { km: 44.1,  naam: "Begin RBR Becquigny (4,8 km)", type: "rbr" },
+  { km: 47.4,  naam: "Becquigny", type: "door" },
+  { km: 49.6,  naam: "Busigny", type: "door" },
+  { km: 56.8,  naam: "Bertry", type: "door" },
+  { km: 57.2,  naam: "Toilet Bertry", type: "toilet" },
+  { km: 59.6,  naam: "Troisvilles", type: "door" },
+  { km: 65.2,  naam: "Viesly", type: "door" },
+  { km: 67.1,  naam: "Briastre", type: "door" },
+  { km: 70.3,  naam: "Solesmes", type: "door" },
+  { km: 74.0,  naam: "Vertain", type: "door" },
+  { km: 76.5,  naam: "CP03 Escarmain", type: "cp" },
+  { km: 76.6,  naam: "Toilet Escarmain", type: "toilet" },
+  { km: 83.8,  naam: "Ruesnes", type: "door" },
+  { km: 87.2,  naam: "Sepmeries", type: "door" },
+  { km: 89.5,  naam: "Maresches", type: "door" },
+  { km: 92.5,  naam: "Préseau", type: "door" },
+  { km: 94.4,  naam: "Toilet Saultin", type: "toilet" },
+  { km: 95.4,  naam: "Begin RBR Saultain (1,6 km)", type: "rbr" },
+  { km: 97.5,  naam: "Curgies", type: "door" },
+  { km: 101.4, naam: "WP02 – Curgies / Sebourg", type: "wp", tijd: "za 22:23", team: "B→A" },
+  { km: 101.5, naam: "Doorkomst Sebourg", type: "door" },
+  { km: 101.8, naam: "Sebourg", type: "door" },
+  { km: 104.2, naam: "Rombies-et-Marchipont", type: "door" },
+  { km: 108.4, naam: "Quiévrechain", type: "door" },
+  { km: 110.0, naam: "Quievrain", type: "door" },
+  { km: 113.5, naam: "Hensies", type: "door" },
+  { km: 113.8, naam: "Toilet Hensies", type: "toilet" },
+  { km: 114.0, naam: "CP04 Hensies", type: "cp" },
+  { km: 124.1, naam: "Stambruges", type: "door" },
+  { km: 128.9, naam: "Beloeil", type: "door" },
+  { km: 136.6, naam: "Chièvres", type: "door" },
+  { km: 139.0, naam: "Toilet Atre", type: "toilet" },
+  { km: 140.0, naam: "Atre", type: "door" },
+  { km: 146.8, naam: "Ghislenghien", type: "door" },
+  { km: 151.8, naam: "Bassily", type: "door" },
+  { km: 156.5, naam: "Bever", type: "door" },
+  { km: 158.8, naam: "WP03 – Bever", type: "wp", tijd: "zo 03:36", team: "A→B" },
+  { km: 160.3, naam: "Viane", type: "door" },
+  { km: 160.3, naam: "Toilet Viane", type: "toilet" },
+  { km: 160.4, naam: "CP05 Viane", type: "cp" },
+  { km: 161.3, naam: "Moerbeke", type: "door" },
+  { km: 166.2, naam: "Geraardsbergen", type: "door" },
+  { km: 166.3, naam: "Begin RBR Geraardsbergen (0,8 km)", type: "rbr" },
+  { km: 168.9, naam: "Begin RBR Onkerzele (0,5 km)", type: "rbr" },
+  { km: 169.4, naam: "Onkerzele", type: "door" },
+  { km: 171.6, naam: "Grimminge", type: "door" },
+  { km: 175.3, naam: "Roost", type: "door" },
+  { km: 178.7, naam: "Begin RBR Ninove (1,5 km)", type: "rbr" },
+  { km: 180.6, naam: "Ninove", type: "door" },
+  { km: 184.7, naam: "Denderhoutem", type: "door" },
+  { km: 186.2, naam: "Toilet Haaltert", type: "toilet" },
+  { km: 192.2, naam: "Begin RBR Aalst Station (0,8 km)", type: "rbr" },
+  { km: 194.9, naam: "Aalst", type: "door" },
+  { km: 196.2, naam: "Doorkomst Aalst", type: "door" },
+  { km: 199.7, naam: "CP Steunpunt Moorsel", type: "cp" },
+  { km: 200.1, naam: "Moorsel", type: "door" },
+  { km: 205.0, naam: "Nijverseel", type: "door" },
+  { km: 206.8, naam: "CP06 Opwijk", type: "cp" },
+  { km: 206.9, naam: "Toilet Opwijk", type: "toilet" },
+  { km: 210.3, naam: "Opstal", type: "door" },
+  { km: 216.2, naam: "WP04 – Opstal", type: "wp", tijd: "zo 08:49", team: "B→A" },
+  { km: 216.6, naam: "Sint-Gillis-bij-Dendermonde", type: "door" },
+  { km: 218.3, naam: "Doorkomst Dendermonde", type: "door" },
+  { km: 219.0, naam: "Dendermonde", type: "door" },
+  { km: 226.5, naam: "Begin RBR Zele (1,2 km)", type: "rbr" },
+  { km: 227.2, naam: "Doorkomst Zele", type: "door" },
+  { km: 231.3, naam: "Durmen", type: "door" },
+  { km: 235.4, naam: "Toilet Hamme", type: "toilet" },
+  { km: 238.4, naam: "Hamme", type: "door" },
+  { km: 239.0, naam: "Doorkomst Hamme", type: "door" },
+  { km: 240.3, naam: "Elversele", type: "door" },
+  { km: 241.7, naam: "Tielrode", type: "door" },
+  { km: 245.8, naam: "Temse", type: "door" },
+  { km: 250.3, naam: "Hemelrijk", type: "door" },
+  { km: 252.8, naam: "Bazel", type: "door" },
+  { km: 255.6, naam: "Kruibeke", type: "door" },
+  { km: 257.3, naam: "CP07 Kruibeke", type: "cp" },
+  { km: 257.4, naam: "Toilet Kruibeke", type: "toilet" },
+  { km: 261.5, naam: "Burcht", type: "door" },
+  { km: 266.3, naam: "Antwerpen", type: "door" },
+  { km: 273.6, naam: "WP05 – Antwerpen", type: "wp", tijd: "zo 14:02", team: "A→B" },
+  { km: 279.6, naam: "Brasschaat", type: "door" },
+  { km: 282.4, naam: "Toilet Brasschaat", type: "toilet" },
+  { km: 283.4, naam: "Maria-ter-Heide", type: "door" },
+  { km: 287.1, naam: "Gooreind", type: "door" },
+  { km: 292.8, naam: "Wuustwezel", type: "door" },
+  { km: 299.7, naam: "De Lent", type: "door" },
+  { km: 302.9, naam: "Begin RBR Zundert (1,5 km)", type: "rbr" },
+  { km: 303.2, naam: "Zundert", type: "door" },
+  { km: 304.0, naam: "Doorkomst Zundert", type: "door" },
+  { km: 305.0, naam: "CP08 Zundert", type: "cp" },
+  { km: 305.1, naam: "Toilet Zundert", type: "toilet" },
+  { km: 309.9, naam: "Doorkomst Rijsbergen", type: "door" },
+  { km: 310.7, naam: "Rijsbergen", type: "door" },
+  { km: 319.4, naam: "Strijbeek", type: "door" },
+  { km: 323.9, naam: "Toilet Chaam", type: "toilet" },
+  { km: 325.3, naam: "Chaam", type: "door" },
+  { km: 331.0, naam: "WP06 – Chaam", type: "wp", tijd: "zo 19:15", team: "B→A" },
+  { km: 332.7, naam: "Doorkomst Gilze", type: "door" },
+  { km: 332.7, naam: "Gilze", type: "door" },
+  { km: 334.2, naam: "Nerhoven", type: "door" },
+  { km: 338.9, naam: "Tilburg", type: "door" },
+  { km: 340.1, naam: "Doorkomst Tilburg", type: "door" },
+  { km: 340.1, naam: "Toilet Tilburg", type: "toilet" },
+  { km: 346.1, naam: "CP09 Dongen", type: "cp" },
+  { km: 346.3, naam: "Toilet Dongen", type: "toilet" },
+  { km: 347.3, naam: "Dongen", type: "door" },
+  { km: 350.1, naam: "Doorkomst Dongen", type: "door" },
+  { km: 356.1, naam: "Rijen", type: "door" },
+  { km: 360.1, naam: "Molenschot", type: "door" },
+  { km: 365.3, naam: "Bavel", type: "door" },
+  { km: 369.9, naam: "Breda", type: "door" },
+  { km: 370.2, naam: "Doorkomst Breda – Honingraad", type: "door" },
+  { km: 370.2, naam: "Toilet Breda", type: "toilet" },
+  { km: 372.4, naam: "Doorkomst Breda Centrum", type: "door" },
+  { km: 375.7, naam: "Princenhage", type: "door" },
+  { km: 383.8, naam: "Doorkomst Etten-Leur", type: "door" },
+  { km: 384.2, naam: "Etten-Leur", type: "door" },
+  { km: 388.4, naam: "WP07 – Sprundel", type: "wp", tijd: "zo 00:28", team: "A→B" },
+  { km: 389.8, naam: "Doorkomst Sprundel", type: "door" },
+  { km: 390.9, naam: "Sprundel", type: "door" },
+  { km: 392.1, naam: "Sint Willebrord", type: "door" },
+  { km: 397.0, naam: "CP10 Hoeven", type: "cp" },
+  { km: 397.2, naam: "Hoeven", type: "door" },
+  { km: 397.8, naam: "Toilet Hoeven", type: "toilet" },
+  { km: 403.4, naam: "Doorkomst Oudenbosch", type: "door" },
+  { km: 403.8, naam: "Oudenbosch", type: "door" },
+  { km: 409.1, naam: "Doorkomst Oud Gastel", type: "door" },
+  { km: 421.8, naam: "Roosendaal", type: "door" },
+  { km: 422.4, naam: "Doorkomst Roosendaal", type: "door" },
+  { km: 423.9, naam: "Toilet Roosendaal", type: "toilet" },
+  { km: 431.0, naam: "Wouwse Plantage", type: "door" },
+  { km: 437.2, naam: "Huijbergen", type: "door" },
+  { km: 442.5, naam: "Toilet Ossendrecht", type: "toilet" },
+  { km: 444.7, naam: "Doorkomst Ossendrecht", type: "door" },
+  { km: 445.8, naam: "WP08 – Ossendrecht", type: "wp", tijd: "ma 05:41", team: "B→A" },
+  { km: 447.9, naam: "Hoogerheide", type: "door" },
+  { km: 449.6, naam: "CP11 Hoogerheide", type: "cp" },
+  { km: 450.4, naam: "Doorkomst Hoogerheide", type: "door" },
+  { km: 457.1, naam: "Doorkomst Bergen op Zoom", type: "door" },
+  { km: 460.1, naam: "Bergen op Zoom", type: "door" },
+  { km: 460.1, naam: "Toilet Bergen op Zoom", type: "toilet" },
+  { km: 462.6, naam: "Doorkomst Bergen op Zoom ('t Rijks)", type: "door" },
+  { km: 466.3, naam: "Halsteren", type: "door" },
+  { km: 467.1, naam: "Doorkomst Halsteren", type: "door" },
+  { km: 469.1, naam: "Lepelstraat", type: "door" },
+  { km: 476.4, naam: "Steenbergen", type: "door" },
+  { km: 483.3, naam: "Toilet Dinteloord", type: "toilet" },
+  { km: 483.5, naam: "CP12 Dinteloord", type: "cp" },
+  { km: 484.4, naam: "Dinteloord", type: "door" },
+  { km: 486.4, naam: "Wisselplaats Dintelmond", type: "cp" },
+  { km: 486.4, naam: "Toilet Dintelmond", type: "toilet" },
+  { km: 488.2, naam: "Heijningen", type: "door" },
+  { km: 492.5, naam: "Helwijk", type: "door" },
+  { km: 495.0, naam: "Doorkomst Willemstad", type: "door" },
+  { km: 495.6, naam: "Willemstad", type: "door" },
+  { km: 506.2, naam: "WP09 – Numansdorp", type: "wp", tijd: "ma 10:56", team: "A→B" },
+  { km: 506.2, naam: "Toilet Numansdorp", type: "toilet" },
+  { km: 507.4, naam: "Numansdorp", type: "door" },
+  { km: 508.8, naam: "Doorkomst Numansdorp", type: "door" },
+  { km: 509.0, naam: "Middelsluis", type: "door" },
+  { km: 511.1, naam: "Oudesluis", type: "door" },
+  { km: 512.0, naam: "Klaaswaal", type: "door" },
+  { km: 518.7, naam: "Toilet Oud-Beijerland I", type: "toilet" },
+  { km: 518.7, naam: "Wisselplaats Oud-Beijerland I", type: "cp" },
+  { km: 519.2, naam: "Wisselplaats Oud-Beijerland II", type: "cp" },
+  { km: 519.5, naam: "Doorkomst Oud-Beijerland", type: "door" },
+  { km: 521.0, naam: "Oud-Beijerland", type: "door" },
+  { km: 527.6, naam: "Heinenoord", type: "door" },
+  { km: 533.4, naam: "Toilet Barendrecht", type: "toilet" },
+  { km: 533.4, naam: "CP13 Barendrecht", type: "cp" },
+  { km: 535.2, naam: "Barendrecht", type: "door" },
+  { km: 536.9, naam: "Doorkomst Hospice De Reiziger", type: "door" },
+  { km: 540.4, naam: "Rotterdam", type: "door" },
+  { km: 540.5, naam: "Doorkomst Lombardijen", type: "door" },
+  { km: 540.6, naam: "Toilet Lombardijen", type: "toilet" },
+  { km: 545.5, naam: "CP14 Wilhelminaplein (Tijdregistratie)", type: "cp" },
+  { km: 547.6, naam: "FINISH – Coolsingel Rotterdam", type: "finish", tijd: "ma ~14:24" },
+];
+
+const STARTMS = new Date("2026-05-23T13:10:00+02:00").getTime();
+const TOTAL_KM = 547.6;
+const DEFAULT_SPEED = 11.0;
+
+function pad(n) { return String(n).padStart(2, "0"); }
+function formatDuur(ms) {
+  if (ms <= 0) return "—";
+  const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000);
+  return `${h}u ${pad(m)}m`;
+}
+function calcEtaMs(vanKm, naarKm, snelheid) {
+  if (!snelheid || snelheid <= 0 || naarKm <= vanKm) return null;
+  return Date.now() + ((naarKm - vanKm) / snelheid) * 3600000;
+}
+function formatEta(ms) {
+  if (!ms) return null;
+  const d = new Date(ms);
+  return `${["zo","ma","di","wo","do","vr","za"][d.getDay()]} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+const STIJL = {
+  start:  { kleur: "#f59e0b", icon: "🚀", label: "Start" },
+  wp:     { kleur: "#4ade80", icon: "🔄", label: "Wisselpunt" },
+  finish: { kleur: "#3b82f6", icon: "🏁", label: "Finish" },
+  cp:     { kleur: "#fde047", icon: "⭐", label: "Checkpoint" },
+  rbr:    { kleur: "#f97316", icon: "🚴", label: "Run-Bike-Run" },
+  door:   { kleur: "#60a5fa", icon: "📍", label: "Doorkomst" },
+  toilet: { kleur: "#a3e635", icon: "🚽", label: "Toilet" },
+};
+
+// ── PIN SCHERM ────────────────────────────────────────────────────────────────
+function PinScherm({ onSuccess }) {
+  const [pin, setPin] = useState("");
+  const [fout, setFout] = useState(false);
+
+  function drukKnop(k) {
+    if (k === "⌫") { setPin(p => p.slice(0,-1)); setFout(false); return; }
+    const nieuw = pin + k;
+    setPin(nieuw);
+    if (nieuw.length === 4) {
+      if (nieuw === TEAM_PIN) { onSuccess(); }
+      else { setFout(true); setTimeout(() => { setPin(""); setFout(false); }, 600); }
+    }
+  }
+
+  return (
+    <div style={{ fontFamily: "-apple-system,BlinkMacSystemFont,sans-serif", background: "#0f1923", minHeight: "100vh", color: "white", maxWidth: 430, margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32 }}>
+      <div style={{ fontSize: 32, marginBottom: 8 }}>🔒</div>
+      <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>Team App</div>
+      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 40 }}>Voer de pincode in</div>
+
+      {/* Dots */}
+      <div style={{ display: "flex", gap: 16, marginBottom: 40 }}>
+        {[0,1,2,3].map(i => (
+          <div key={i} style={{ width: 18, height: 18, borderRadius: "50%", background: fout ? "#ef4444" : pin.length > i ? "#4ade80" : "rgba(255,255,255,0.15)", transition: "background 0.15s", transform: fout ? "scale(1.2)" : "scale(1)" }} />
+        ))}
+      </div>
+
+      {/* Numpad */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, width: "100%", maxWidth: 280 }}>
+        {["1","2","3","4","5","6","7","8","9","","0","⌫"].map((k, i) => (
+          k === "" ? <div key={i} /> :
+          <button key={i} onClick={() => drukKnop(k)} style={{ padding: "18px 0", fontSize: k === "⌫" ? 20 : 22, fontWeight: 600, borderRadius: 14, border: "none", background: k === "⌫" ? "#1a2530" : "#1e3a2e", color: "white", cursor: "pointer", fontFamily: "inherit", transition: "transform 0.1s", active: "transform: scale(0.95)" }}>
+            {k}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── TEAM APP ──────────────────────────────────────────────────────────────────
+function TeamApp({ onSwitch }) {
+  const [ingelogd, setIngelogd] = useState(false);
+  const [sel, setSel] = useState(null);
+  const [log, setLog] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState("");
+  const [filter, setFilter] = useState("wp");
+  const [zoek, setZoek] = useState("");
+
+  if (!ingelogd) return <PinScherm onSuccess={() => setIngelogd(true)} />;
+
+  function nowStr() { return new Date().toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit", second: "2-digit" }); }
+  function addLog(msg, t) { setLog(p => [{ msg, t, time: nowStr() }, ...p].slice(0, 10)); }
+  function showToast(msg) { setToast(msg); setTimeout(() => setToast(""), 3000); }
+
+  function bevestig() {
+    if (!sel) { showToast("Kies eerst een punt"); return; }
+    setLoading(true);
+    const url = SCRIPT_URL + '?type=checkpoint&team=HW-Runners&checkpoint=' + encodeURIComponent(sel.naam) + '&km=' + sel.km + '&timestamp=' + encodeURIComponent(new Date().toISOString());
+    fetch(url)
+      .then(r => r.json())
+      .then(data => { if (data.ok) { addLog(`✓ ${sel.naam} (${sel.km} km)`, "ok"); showToast(`✓ ${sel.naam} gelogd!`); setLoading(false); setSel(null); } else { throw new Error(); } })
+      .catch(() => { addLog("Versturen mislukt — check verbinding", "err"); setLoading(false); });
+  }
+
+  const toonTypes = {
+    wp:    ["start","wp","finish"],
+    cp:    ["start","wp","finish","cp"],
+    rbr:   ["start","wp","finish","rbr"],
+    alles: ["start","wp","finish","cp","rbr","door","toilet"],
+  };
+
+  const zichtbaar = ROUTE.filter(p => {
+    if (!toonTypes[filter]?.includes(p.type)) return false;
+    if (zoek && !p.naam.toLowerCase().includes(zoek.toLowerCase())) return false;
+    return true;
+  });
+
+  return (
+    <div style={{ fontFamily: "-apple-system,BlinkMacSystemFont,sans-serif", background: "#0f1923", minHeight: "100vh", color: "white", maxWidth: 430, margin: "0 auto", paddingBottom: 40 }}>
+      <div style={{ background: "linear-gradient(135deg,#1a3a2a,#0f2a1a)", padding: "44px 20px 16px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <div style={{ fontSize: 11, color: "#4ade80", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 4 }}>HW-Runners · Roparun 2026</div>
+            <div style={{ fontSize: 22, fontWeight: 700 }}>Team App 📱</div>
+            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>Geef door bij welk punt je bent</div>
+          </div>
+          <button onClick={() => setIngelogd(false)} style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 99, padding: "6px 12px", color: "rgba(255,255,255,0.4)", fontSize: 12, cursor: "pointer" }}>🔒 Slot</button>
+        </div>
+      </div>
+
+      <div style={{ padding: "14px 16px 0" }}>
+        {/* Filter tabs */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
+          {[["wp","Wisselpunten"],["cp","+ Checkpoints"],["rbr","+ RBR"],["alles","Alles"]].map(([k,l]) => (
+            <button key={k} onClick={() => setFilter(k)} style={{ padding: "5px 12px", borderRadius: 99, border: "none", fontSize: 12, fontWeight: 500, cursor: "pointer", background: filter === k ? "#4ade80" : "#1a2530", color: filter === k ? "#0a2e14" : "rgba(255,255,255,0.6)" }}>{l}</button>
+          ))}
+        </div>
+
+        {/* Zoek */}
+        <input value={zoek} onChange={e => setZoek(e.target.value)} placeholder="Zoek plaats of punt…" style={{ width: "100%", padding: "9px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "#1a2530", color: "white", fontSize: 14, outline: "none", fontFamily: "inherit", marginBottom: 10 }} />
+
+        {/* Lijst */}
+        <div style={{ background: "#1a2530", borderRadius: 14, overflow: "hidden", marginBottom: 14, maxHeight: 420, overflowY: "auto" }}>
+          {zichtbaar.map((p, i) => {
+            const s = STIJL[p.type];
+            const selected = sel?.km === p.km && sel?.naam === p.naam;
+            const isWP = ["start","wp","finish"].includes(p.type);
+            return (
+              <div key={i} onClick={() => setSel(selected ? null : p)} style={{ padding: isWP ? "13px 16px" : "9px 16px", borderBottom: i < zichtbaar.length-1 ? "1px solid rgba(255,255,255,0.05)" : "none", display: "flex", alignItems: "center", gap: 12, background: selected ? "rgba(74,222,128,0.12)" : "transparent", cursor: "pointer" }}>
+                <div style={{ width: isWP ? 32 : 24, height: isWP ? 32 : 24, borderRadius: "50%", background: selected ? s.kleur : isWP ? "#1e3a2e" : "rgba(255,255,255,0.05)", border: selected ? `2px solid ${s.kleur}` : isWP ? "1px solid rgba(255,255,255,0.15)" : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: isWP ? 14 : 11, flexShrink: 0 }}>{s.icon}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: isWP ? 14 : 12, fontWeight: isWP ? 600 : 400, color: selected ? "#4ade80" : isWP ? "white" : "rgba(255,255,255,0.55)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.naam}</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", marginTop: 1 }}>{p.km} km{p.tijd ? ` · ${p.tijd}` : ""}{p.team ? ` · ${p.team}` : ""}</div>
+                </div>
+                {selected && <div style={{ color: "#4ade80", fontSize: 18, flexShrink: 0 }}>✓</div>}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Bevestig knop */}
+        <button onClick={bevestig} disabled={loading || !sel} style={{ width: "100%", padding: 16, fontSize: 16, fontWeight: 700, borderRadius: 14, border: "none", background: !sel ? "#1a2530" : loading ? "#1a3a2a" : "linear-gradient(135deg,#16a34a,#4ade80)", color: !sel ? "rgba(255,255,255,0.3)" : "#000", cursor: !sel ? "default" : "pointer", marginBottom: 14, transition: "all 0.2s" }}>
+          {loading ? "Versturen…" : sel ? `✓ Bevestig: ${sel.naam}` : "Selecteer een punt hierboven"}
+        </button>
+
+        {/* Log */}
+        {log.length > 0 && (
+          <div style={{ background: "#1a2530", borderRadius: 14, overflow: "hidden", marginBottom: 14 }}>
+            <div style={{ padding: "8px 16px 4px", fontSize: 10, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Log</div>
+            {log.map((l, i) => (
+              <div key={i} style={{ padding: "8px 16px", borderTop: "1px solid rgba(255,255,255,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontSize: 12, color: l.t === "ok" ? "#4ade80" : "#f87171" }}>{l.msg}</span>
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", flexShrink: 0, marginLeft: 8 }}>{l.time}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div style={{ textAlign: "center" }}>
+          <button onClick={onSwitch} style={{ background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 99, padding: "8px 20px", fontSize: 13, color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>👀 Supporter-tracker</button>
+        </div>
+      </div>
+
+      {toast && <div style={{ position: "fixed", bottom: 30, left: "50%", transform: "translateX(-50%)", background: "#16a34a", color: "white", padding: "12px 24px", borderRadius: 99, fontSize: 14, fontWeight: 600, zIndex: 100, whiteSpace: "nowrap", boxShadow: "0 8px 30px rgba(0,0,0,0.4)" }}>{toast}</div>}
+    </div>
+  );
+}
+
+// ── SUPPORTER TRACKER ─────────────────────────────────────────────────────────
+function SupporterTracker({ onSwitch }) {
+  const [checkpoints, setCheckpoints] = useState([]);
+  const [lastUpdate, setLastUpdate] = useState(null);
+  const [filter, setFilter] = useState("belangrijk");
+  const [zoek, setZoek] = useState("");
+
+  useEffect(() => { fetchData(); const t = setInterval(fetchData, 30000); return () => clearInterval(t); }, []);
+
+  function fetchData() {
+    fetch(SCRIPT_URL + "?type=checkpoints")
+      .then(r => r.json())
+      .then(data => {
+        if (data.checkpoints?.length > 1) setCheckpoints(data.checkpoints.slice(1).map(r => ({ timestamp: r[0], naam: r[2], km: parseFloat(r[3]) || 0 })));
+        setLastUpdate(new Date());
+      }).catch(() => {});
+  }
+
+  const huidigKm = checkpoints.length > 0 ? Math.max(...checkpoints.map(c => c.km)) : 0;
+  const pct = Math.min(100, Math.round((huidigKm / TOTAL_KM) * 100));
+
+  let snelheid = DEFAULT_SPEED;
+  if (checkpoints.length >= 2) {
+    const sorted = [...checkpoints].sort((a,b) => a.km - b.km);
+    const dtMs = new Date(sorted.at(-1).timestamp) - new Date(sorted[0].timestamp);
+    const dKm = sorted.at(-1).km - sorted[0].km;
+    if (dtMs > 0 && dKm > 0) snelheid = dKm / (dtMs / 3600000);
+  }
+
+  const huidigPunt = ROUTE.filter(p => p.km <= huidigKm).at(-1) || ROUTE[0];
+  const volgendWP = ROUTE.filter(p => ["wp","finish"].includes(p.type) && p.km > huidigKm)[0];
+  const looptijdMs = huidigKm > 0 ? Date.now() - STARTMS : 0;
+
+  const toonTypes = {
+    belangrijk: ["start","wp","finish","cp"],
+    steden: ["start","wp","finish","door"],
+    rbr: ["start","wp","finish","rbr"],
+    alles: ["start","wp","finish","cp","rbr","door","toilet"],
+  };
+
+  const zichtbaar = ROUTE.filter(p => {
+    if (!toonTypes[filter]?.includes(p.type)) return false;
+    if (zoek && !p.naam.toLowerCase().includes(zoek.toLowerCase())) return false;
+    return true;
+  });
+
+  return (
+    <div style={{ fontFamily: "-apple-system,BlinkMacSystemFont,sans-serif", background: "#0f1923", minHeight: "100vh", color: "white", maxWidth: 430, margin: "0 auto", paddingBottom: 40 }}>
+      {/* Header */}
+      <div style={{ background: "linear-gradient(135deg,#0a1f2e,#0f2a1a)", padding: "44px 20px 16px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+          <div>
+            <div style={{ fontSize: 11, color: "#4ade80", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 4 }}>HW-Runners · Live</div>
+            <div style={{ fontSize: 22, fontWeight: 700 }}>Roparun 2026 🏃</div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{lastUpdate ? `${pad(lastUpdate.getHours())}:${pad(lastUpdate.getMinutes())}` : "—"}</div>
+            <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#4ade80", marginTop: 4, marginLeft: "auto", animation: "pulse 2s infinite" }} />
+          </div>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 5 }}>
+          <span>Clastres</span><span style={{ color: "#4ade80", fontWeight: 600 }}>{pct}% · {huidigKm} km</span><span>Rotterdam</span>
+        </div>
+        <div style={{ height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 3, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg,#16a34a,#4ade80)", borderRadius: 3, transition: "width 0.8s" }} />
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, padding: "12px 16px 0" }}>
+        {[
+          { val: `${huidigKm}`, sub: `/${TOTAL_KM}km`, lbl: "Afstand" },
+          { val: `${snelheid.toFixed(1)}`, sub: "km/h", lbl: "Snelheid" },
+          { val: formatDuur(looptijdMs), sub: "", lbl: "Onderweg" },
+          { val: formatEta(calcEtaMs(huidigKm, TOTAL_KM, snelheid)) || "—", sub: "finish", lbl: "ETA" },
+        ].map((s, i) => (
+          <div key={i} style={{ background: "#1a2530", borderRadius: 12, padding: "10px 8px", textAlign: "center" }}>
+            <div style={{ fontSize: i === 2 ? 12 : 15, fontWeight: 700, lineHeight: 1.2 }}>{s.val}</div>
+            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{s.sub}</div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{s.lbl}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Nu / Volgend */}
+      <div style={{ padding: "10px 16px 0", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+        <div style={{ background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.2)", borderRadius: 12, padding: "12px 14px" }}>
+          <div style={{ fontSize: 10, color: "#4ade80", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 3 }}>📍 Nu bij</div>
+          <div style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.3 }}>{huidigPunt.naam}</div>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>{huidigPunt.km} km</div>
+        </div>
+        {volgendWP && (
+          <div style={{ background: "#1a2530", borderRadius: 12, padding: "12px 14px" }}>
+            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 3 }}>🎯 Volgend WP</div>
+            <div style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.3 }}>{volgendWP.naam.split("–").pop()?.trim()}</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>{formatEta(calcEtaMs(huidigKm, volgendWP.km, snelheid)) || volgendWP.tijd}</div>
+          </div>
+        )}
+      </div>
+
+      {/* Filter + zoek */}
+      <div style={{ padding: "14px 16px 0" }}>
+        <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
+          {[["belangrijk","WP + CP"],["steden","Steden"],["rbr","RBR"],["alles","Alles"]].map(([k,l]) => (
+            <button key={k} onClick={() => setFilter(k)} style={{ padding: "5px 12px", borderRadius: 99, border: "none", fontSize: 12, fontWeight: 500, cursor: "pointer", background: filter === k ? "#4ade80" : "#1a2530", color: filter === k ? "#0a2e14" : "rgba(255,255,255,0.6)" }}>{l}</button>
+          ))}
+        </div>
+        <input value={zoek} onChange={e => setZoek(e.target.value)} placeholder="Zoek plaats…" style={{ width: "100%", padding: "9px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "#1a2530", color: "white", fontSize: 14, outline: "none", fontFamily: "inherit", marginBottom: 10 }} />
+      </div>
+
+      {/* Route tijdlijn */}
+      <div style={{ padding: "0 16px" }}>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>Route · {zichtbaar.length} punten</div>
+        <div style={{ background: "#1a2530", borderRadius: 14, overflow: "hidden" }}>
+          {zichtbaar.map((p, i) => {
+            const s = STIJL[p.type];
+            const isWP = ["start","wp","finish"].includes(p.type);
+            const gepasseerd = p.km <= huidigKm;
+            const isNu = p.km === huidigPunt.km;
+            const werkelijk = checkpoints.find(c => c.naam === p.naam);
+            const eta = !gepasseerd ? formatEta(calcEtaMs(huidigKm, p.km, snelheid)) : null;
+            return (
+              <div key={i} style={{ padding: isWP ? "13px 16px" : "8px 16px", borderBottom: i < zichtbaar.length-1 ? `1px solid rgba(255,255,255,${isWP?"0.08":"0.04"})` : "none", display: "flex", alignItems: "center", gap: 10, background: isNu ? "rgba(74,222,128,0.06)" : isWP ? "rgba(255,255,255,0.01)" : "transparent" }}>
+                <div style={{ width: isWP ? 28 : 18, height: isWP ? 28 : 18, borderRadius: "50%", flexShrink: 0, background: gepasseerd ? (isWP ? "#16a34a" : "rgba(74,222,128,0.15)") : "#1e3a2e", border: isNu ? `2px solid ${s.kleur}` : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: isWP ? 12 : 9 }}>
+                  {gepasseerd && isWP ? "✓" : s.icon}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: isWP ? 14 : 12, fontWeight: isWP ? 600 : 400, color: gepasseerd ? (isWP ? "#4ade80" : "rgba(74,222,128,0.6)") : isWP ? "white" : "rgba(255,255,255,0.5)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.naam}</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.2)", marginTop: 1 }}>{p.km} km{p.team ? ` · ${p.team}` : ""}</div>
+                </div>
+                <div style={{ textAlign: "right", flexShrink: 0, minWidth: 56 }}>
+                  {werkelijk ? (
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "#4ade80" }}>{new Date(werkelijk.timestamp).toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"})}</div>
+                  ) : eta ? (
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", fontStyle: "italic" }}>~{eta}</div>
+                  ) : p.tijd ? (
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.2)" }}>{p.tijd}</div>
+                  ) : null}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Legenda */}
+      <div style={{ padding: "12px 16px 0" }}>
+        <div style={{ background: "#1a2530", borderRadius: 12, padding: "10px 14px", display: "flex", flexWrap: "wrap", gap: "5px 12px" }}>
+          {Object.entries(STIJL).map(([k,v]) => (
+            <div key={k} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
+              <span>{v.icon}</span><span>{v.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ textAlign: "center", marginTop: 20 }}>
+        <button onClick={onSwitch} style={{ background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 99, padding: "8px 20px", fontSize: 13, color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>📱 Naar team-app</button>
+      </div>
+
+      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}`}</style>
+    </div>
+  );
+}
+
+// ── ROOT ──────────────────────────────────────────────────────────────────────
+function App() {
+  const [view, setView] = useState("supporter");
+  return view === "team"
+    ? <TeamApp onSwitch={() => setView("supporter")} />
+    : <SupporterTracker onSwitch={() => setView("team")} />;
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
