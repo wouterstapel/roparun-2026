@@ -9,10 +9,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body { background: #0f1923; }
-  #root { max-width: 430px; margin: 0 auto; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { background: #0f1923; }
+#root { max-width: 430px; margin: 0 auto; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 </style>
 </head>
 <body>
@@ -22,6 +25,9 @@ const { useState, useEffect, useRef } = React;
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvSVgpQbon1axHL_5se9l8UslwDuRM9DjJMfLSx_sV0AaCkBUvS0Pgk4ZAsJSZLI_H/exec";
 const TEAM_PIN = "2026";
+const STARTMS = new Date("2026-05-23T13:10:00+02:00").getTime();
+const TOTAL_KM = 547.6;
+const DEFAULT_SPEED = 11.0;
 
 const ROUTE = [
   { km: 0,     naam: "START – Circuit La Clef des Champs", type: "start", tijd: "za 13:10" },
@@ -222,25 +228,903 @@ const ROUTE = [
   { km: 545.5, naam: "CP14 Wilhelminaplein (Tijdregistratie)", type: "cp" },
   { km: 547.6, naam: "FINISH – Coolsingel Rotterdam", type: "finish", tijd: "ma ~14:24" },
 ];
+const ROUTE_COORDS = [
+  [49.7647, 3.2389],
+  [49.78, 3.25],
+  [49.8333, 3.2667],
+  [49.8583, 3.2833],
+  [49.875, 3.3],
+  [49.9, 3.3333],
+  [49.9167, 3.35],
+  [49.9333, 3.3833],
+  [49.95, 3.4],
+  [49.9667, 3.4167],
+  [49.9833, 3.4333],
+  [49.9917, 3.4417],
+  [50.01, 3.45],
+  [50.0019, 3.4561],
+  [50.02, 3.47],
+  [50.05, 3.5],
+  [50.1, 3.5333],
+  [50.1167, 3.55],
+  [50.15, 3.5667],
+  [50.1667, 3.5833],
+  [50.1833, 3.6],
+  [50.2167, 3.6167],
+  [50.2333, 3.6333],
+  [50.2667, 3.65],
+  [50.2833, 3.6667],
+  [50.3, 3.6833],
+  [50.3167, 3.7],
+  [50.3333, 3.7167],
+  [50.35, 3.5833],
+  [50.3361, 3.5572],
+  [50.35, 3.5667],
+  [50.3833, 3.5833],
+  [50.4167, 3.6167],
+  [50.4333, 3.5833],
+  [50.4667, 3.65],
+  [50.5, 3.7167],
+  [50.5333, 3.7667],
+  [50.5833, 3.85],
+  [50.6, 3.8833],
+  [50.6333, 3.9333],
+  [50.6833, 4.0167],
+  [50.7167, 4.0833],
+  [50.7481, 3.8731],
+  [50.7667, 3.9],
+  [50.7833, 3.9167],
+  [50.8, 3.9667],
+  [50.8167, 4.0167],
+  [50.8333, 4.05],
+  [50.85, 4.0833],
+  [50.8667, 4.0167],
+  [50.8833, 4.05],
+  [50.9167, 4.15],
+  [50.9333, 4.1833],
+  [50.95, 4.2167],
+  [50.9667, 4.2333],
+  [50.9833, 4.2167],
+  [51.0167, 4.2333],
+  [51.0333, 4.25],
+  [51.0667, 4.25],
+  [51.0833, 4.2833],
+  [51.1, 4.3167],
+  [51.1167, 4.3333],
+  [51.1333, 4.35],
+  [51.15, 4.3667],
+  [51.1667, 4.3833],
+  [51.1833, 4.4],
+  [51.2, 4.3833],
+  [51.2167, 4.4],
+  [51.2333, 4.4167],
+  [51.2194, 4.4025],
+  [51.2833, 4.45],
+  [51.3, 4.4833],
+  [51.3333, 4.5333],
+  [51.3667, 4.5833],
+  [51.3833, 4.6167],
+  [51.4, 4.6333],
+  [51.4333, 4.65],
+  [51.4667, 4.7],
+  [51.5, 4.8],
+  [51.5333, 4.8667],
+  [51.55, 4.9167],
+  [51.5667, 5.05],
+  [51.6, 4.9333],
+  [51.5833, 4.9],
+  [51.5667, 4.8667],
+  [51.55, 4.8333],
+  [51.5833, 4.7833],
+  [51.5667, 4.7167],
+  [51.5667, 4.65],
+  [51.5667, 4.6333],
+  [51.5833, 4.5667],
+  [51.5667, 4.5333],
+  [51.55, 4.5167],
+  [51.5333, 4.5],
+  [51.5167, 4.4833],
+  [51.5333, 4.4667],
+  [51.5, 4.4333],
+  [51.4667, 4.4167],
+  [51.4167, 4.35],
+  [51.4667, 4.35],
+  [51.4333, 4.3333],
+  [51.45, 4.2833],
+  [51.5, 4.2667],
+  [51.5833, 4.25],
+  [51.6167, 4.2667],
+  [51.6333, 4.3667],
+  [51.65, 4.3833],
+  [51.6667, 4.3833],
+  [51.6833, 4.4],
+  [51.7, 4.4],
+  [51.7261, 4.4161],
+  [51.7333, 4.4167],
+  [51.75, 4.3833],
+  [51.7667, 4.3667],
+  [51.7833, 4.35],
+  [51.8, 4.3667],
+  [51.8333, 4.5],
+  [51.85, 4.5333],
+  [51.8833, 4.5167],
+  [51.91, 4.4833],
+  [51.9167, 4.4833],
+  [51.9225, 4.4792],
+];
+const KAART_PUNTEN = [
+  { lat: 49.75900, lon: 3.22391, naam: "START – Circuit La Clef des Champs", type: "start" },
+  { lat: 49.74498, lon: 3.23219, naam: "Clastres", type: "door" },
+  { lat: 49.77510, lon: 3.28021, naam: "Essigny-le-Grand", type: "door" },
+  { lat: 49.79004, lon: 3.30918, naam: "Urvillers", type: "door" },
+  { lat: 49.80832, lon: 3.34186, naam: "Itancourt", type: "door" },
+  { lat: 49.82542, lon: 3.33356, naam: "Neuville-Saint-Amand", type: "door" },
+  { lat: 49.83027, lon: 3.35671, naam: "Mesnil-Saint-Laurent", type: "door" },
+  { lat: 49.85055, lon: 3.36454, naam: "Homblières", type: "door" },
+  { lat: 49.89932, lon: 3.36649, naam: "Essigny-le-Petit", type: "door" },
+  { lat: 49.92125, lon: 3.37166, naam: "Fontaine-Uterte", type: "door" },
+  { lat: 49.96447, lon: 3.35484, naam: "Montbrehain", type: "door" },
+  { lat: 49.97653, lon: 3.38227, naam: "Brancourt-le-Grand CP02", type: "cp" },
+  { lat: 49.98932, lon: 3.45110, naam: "Bohain-en-Vermandois", type: "door" },
+  { lat: 49.98923, lon: 3.45160, naam: "WP01 – Bohain-en-Vermandois", type: "wp" },
+  { lat: 50.01612, lon: 3.46960, naam: "Becquigny", type: "door" },
+  { lat: 50.03318, lon: 3.46404, naam: "Busigny", type: "door" },
+  { lat: 50.08978, lon: 3.44801, naam: "Bertry", type: "door" },
+  { lat: 50.10523, lon: 3.47024, naam: "Troisvilles", type: "door" },
+  { lat: 50.15214, lon: 3.46458, naam: "Viesly", type: "door" },
+  { lat: 50.16192, lon: 3.48621, naam: "Briastre", type: "door" },
+  { lat: 50.18666, lon: 3.49698, naam: "Solesmes", type: "door" },
+  { lat: 50.21303, lon: 3.52423, naam: "Vertain", type: "door" },
+  { lat: 50.22896, lon: 3.54706, naam: "Escarmain CP03", type: "cp" },
+  { lat: 50.25855, lon: 3.58839, naam: "Ruesnes", type: "door" },
+  { lat: 50.28211, lon: 3.56403, naam: "Sepmeries", type: "door" },
+  { lat: 50.29275, lon: 3.57753, naam: "Maresches", type: "door" },
+  { lat: 50.31219, lon: 3.57629, naam: "Préseau", type: "door" },
+  { lat: 50.33659, lon: 3.57586, naam: "Saultain", type: "door" },
+  { lat: 50.33004, lon: 3.60349, naam: "Curgies", type: "door" },
+  { lat: 50.34395, lon: 3.64452, naam: "WP02 – Curgies/Sebourg", type: "wp" },
+  { lat: 50.34412, lon: 3.64300, naam: "Sebourg", type: "door" },
+  { lat: 50.36476, lon: 3.64703, naam: "Rombies-et-Marchipont", type: "door" },
+  { lat: 50.39980, lon: 3.66617, naam: "Quiévrechain", type: "door" },
+  { lat: 50.40602, lon: 3.68280, naam: "Quievrain", type: "door" },
+  { lat: 50.43250, lon: 3.68445, naam: "Hensies", type: "door" },
+  { lat: 50.43566, lon: 3.68954, naam: "Hensies CP04", type: "cp" },
+  { lat: 50.50855, lon: 3.71694, naam: "Stambruges", type: "door" },
+  { lat: 50.54863, lon: 3.73524, naam: "Beloeil", type: "door" },
+  { lat: 50.58674, lon: 3.80987, naam: "Chièvres", type: "door" },
+  { lat: 50.60871, lon: 3.83970, naam: "Atre", type: "door" },
+  { lat: 50.65656, lon: 3.87695, naam: "Ghislenghien", type: "door" },
+  { lat: 50.67903, lon: 3.93152, naam: "Bassily", type: "door" },
+  { lat: 50.71645, lon: 3.94004, naam: "Bever", type: "door" },
+  { lat: 50.73581, lon: 3.92929, naam: "WP03 – Bever", type: "wp" },
+  { lat: 50.74342, lon: 3.92298, naam: "Viane", type: "door" },
+  { lat: 50.74381, lon: 3.92311, naam: "Viane CP05", type: "cp" },
+  { lat: 50.75111, lon: 3.91980, naam: "Moerbeke", type: "door" },
+  { lat: 50.77314, lon: 3.88601, naam: "Geraardsbergen", type: "door" },
+  { lat: 50.78576, lon: 3.91731, naam: "Onkerzele", type: "door" },
+  { lat: 50.79449, lon: 3.94671, naam: "Grimminge", type: "door" },
+  { lat: 50.80576, lon: 3.98394, naam: "Roost", type: "door" },
+  { lat: 50.83563, lon: 4.02619, naam: "Ninove", type: "door" },
+  { lat: 50.87063, lon: 4.01746, naam: "Denderhoutem", type: "door" },
+  { lat: 50.94096, lon: 4.04329, naam: "Aalst", type: "door" },
+  { lat: 50.94376, lon: 4.05645, naam: "Doorkomst Aalst", type: "door" },
+  { lat: 50.95167, lon: 4.09462, naam: "CP Steunpunt Moorsel", type: "door" },
+  { lat: 50.94957, lon: 4.09822, naam: "Moorsel", type: "door" },
+  { lat: 50.96178, lon: 4.15511, naam: "Nijverseel", type: "door" },
+  { lat: 50.97196, lon: 4.16861, naam: "Opwijk CP06", type: "cp" },
+  { lat: 50.99746, lon: 4.17682, naam: "Opstal", type: "door" },
+  { lat: 51.02156, lon: 4.11818, naam: "WP04 – Opstal", type: "wp" },
+  { lat: 51.02186, lon: 4.11221, naam: "Sint-Gillis-bij-Dendermonde", type: "door" },
+  { lat: 51.03087, lon: 4.09844, naam: "Dendermonde", type: "door" },
+  { lat: 51.06808, lon: 4.03880, naam: "Zele", type: "door" },
+  { lat: 51.08617, lon: 4.05773, naam: "Durmen", type: "door" },
+  { lat: 51.09997, lon: 4.13837, naam: "Hamme", type: "door" },
+  { lat: 51.11411, lon: 4.14425, naam: "Elversele", type: "door" },
+  { lat: 51.11406, lon: 4.16547, naam: "Tielrode", type: "door" },
+  { lat: 51.12477, lon: 4.21424, naam: "Temse", type: "door" },
+  { lat: 51.13185, lon: 4.27424, naam: "Hemelrijk", type: "door" },
+  { lat: 51.14687, lon: 4.29806, naam: "Bazel", type: "door" },
+  { lat: 51.17015, lon: 4.31216, naam: "Kruibeke", type: "door" },
+  { lat: 51.17554, lon: 4.31855, naam: "Kruibeke CP07", type: "cp" },
+  { lat: 51.20215, lon: 4.34134, naam: "Burcht", type: "door" },
+  { lat: 51.21893, lon: 4.39556, naam: "Antwerpen", type: "door" },
+  { lat: 51.25418, lon: 4.45663, naam: "WP05 – Antwerpen", type: "wp" },
+  { lat: 51.29598, lon: 4.49731, naam: "Brasschaat", type: "door" },
+  { lat: 51.32787, lon: 4.52233, naam: "Maria-ter-Heide", type: "door" },
+  { lat: 51.35338, lon: 4.54680, naam: "Gooreind", type: "door" },
+  { lat: 51.40114, lon: 4.60535, naam: "Wuustwezel", type: "door" },
+  { lat: 51.44494, lon: 4.64361, naam: "De Lent", type: "door" },
+  { lat: 51.46957, lon: 4.65855, naam: "Zundert", type: "door" },
+  { lat: 51.47356, lon: 4.67367, naam: "Zundert CP08", type: "cp" },
+  { lat: 51.51648, lon: 4.70234, naam: "Rijsbergen", type: "door" },
+  { lat: 51.50124, lon: 4.79912, naam: "Strijbeek", type: "door" },
+  { lat: 51.50539, lon: 4.86100, naam: "Chaam", type: "door" },
+  { lat: 51.54058, lon: 4.91752, naam: "WP06 – Chaam", type: "wp" },
+  { lat: 51.54227, lon: 4.94059, naam: "Gilze", type: "door" },
+  { lat: 51.57944, lon: 4.98174, naam: "Tilburg", type: "door" },
+  { lat: 51.61845, lon: 4.95142, naam: "Dongen CP09", type: "cp" },
+  { lat: 51.62479, lon: 4.94273, naam: "Dongen", type: "door" },
+  { lat: 51.59002, lon: 4.91814, naam: "Rijen", type: "door" },
+  { lat: 51.57322, lon: 4.88220, naam: "Molenschot", type: "door" },
+  { lat: 51.56673, lon: 4.82909, naam: "Bavel", type: "door" },
+  { lat: 51.57328, lon: 4.78203, naam: "Breda", type: "door" },
+  { lat: 51.57733, lon: 4.73734, naam: "Princenhage", type: "door" },
+  { lat: 51.56811, lon: 4.63531, naam: "Etten-Leur", type: "door" },
+  { lat: 51.54365, lon: 4.63084, naam: "WP07 – Sprundel", type: "wp" },
+  { lat: 51.53734, lon: 4.59737, naam: "Sprundel", type: "door" },
+  { lat: 51.54568, lon: 4.59192, naam: "Sint Willebrord", type: "door" },
+  { lat: 51.58206, lon: 4.58362, naam: "Hoeven CP10", type: "cp" },
+  { lat: 51.58199, lon: 4.58222, naam: "Hoeven", type: "door" },
+  { lat: 51.58912, lon: 4.52375, naam: "Oudenbosch", type: "door" },
+  { lat: 51.58733, lon: 4.45987, naam: "Oud Gastel", type: "door" },
+  { lat: 51.53112, lon: 4.46081, naam: "Roosendaal", type: "door" },
+  { lat: 51.48122, lon: 4.39762, naam: "Wouwse Plantage", type: "door" },
+  { lat: 51.43192, lon: 4.37668, naam: "Huijbergen", type: "door" },
+  { lat: 51.39668, lon: 4.32833, naam: "Ossendrecht", type: "door" },
+  { lat: 51.40095, lon: 4.33784, naam: "WP08 – Ossendrecht", type: "wp" },
+  { lat: 51.41465, lon: 4.33903, naam: "Hoogerheide", type: "door" },
+  { lat: 51.42314, lon: 4.33166, naam: "Hoogerheide CP11", type: "cp" },
+  { lat: 51.48356, lon: 4.28224, naam: "Bergen op Zoom", type: "door" },
+  { lat: 51.52893, lon: 4.26765, naam: "Halsteren", type: "door" },
+  { lat: 51.54875, lon: 4.27287, naam: "Lepelstraat", type: "door" },
+  { lat: 51.58077, lon: 4.31552, naam: "Steenbergen", type: "door" },
+  { lat: 51.63381, lon: 4.36700, naam: "Dinteloord CP12", type: "cp" },
+  { lat: 51.63615, lon: 4.37159, naam: "Dinteloord", type: "door" },
+  { lat: 51.64636, lon: 4.39245, naam: "Dintelmond", type: "door" },
+  { lat: 51.65546, lon: 4.40985, naam: "Heijningen", type: "door" },
+  { lat: 51.67731, lon: 4.43236, naam: "Helwijk", type: "door" },
+  { lat: 51.69492, lon: 4.44049, naam: "Willemstad", type: "door" },
+  { lat: 51.72604, lon: 4.42378, naam: "WP09 – Numansdorp", type: "wp" },
+  { lat: 51.72986, lon: 4.43818, naam: "Numansdorp", type: "door" },
+  { lat: 51.74516, lon: 4.44107, naam: "Middelsluis", type: "door" },
+  { lat: 51.76073, lon: 4.44427, naam: "Oudesluis", type: "door" },
+  { lat: 51.76835, lon: 4.44431, naam: "Klaaswaal", type: "door" },
+  { lat: 51.82654, lon: 4.41125, naam: "Oud-Beijerland", type: "door" },
+  { lat: 51.82474, lon: 4.48416, naam: "Heinenoord", type: "door" },
+  { lat: 51.84178, lon: 4.53641, naam: "Barendrecht CP13", type: "cp" },
+  { lat: 51.85686, lon: 4.53600, naam: "Barendrecht", type: "door" },
+  { lat: 51.87866, lon: 4.50854, naam: "Rotterdam", type: "door" },
+  { lat: 51.87959, lon: 4.50987, naam: "Lombardijen", type: "door" },
+  { lat: 51.90776, lon: 4.49070, naam: "Wilhelminaplein CP14", type: "cp" },
+  { lat: 51.92243, lon: 4.47897, naam: "FINISH – Coolsingel Rotterdam", type: "finish" },
+];
 
-const STARTMS = new Date("2026-05-23T13:10:00+02:00").getTime();
-const TOTAL_KM = 547.6;
-const DEFAULT_SPEED = 11.0;
+const GPX_ROUTE = [
+  [49.759,3.22391],
+  [49.75047,3.23041],
+  [49.74601,3.23165],
+  [49.74592,3.23586],
+  [49.7433,3.242],
+  [49.73951,3.25217],
+  [49.74363,3.25599],
+  [49.75845,3.27086],
+  [49.77189,3.27547],
+  [49.77736,3.28101],
+  [49.7804,3.28918],
+  [49.78963,3.30734],
+  [49.79386,3.31489],
+  [49.80272,3.32781],
+  [49.80772,3.33368],
+  [49.8151,3.33813],
+  [49.82242,3.33105],
+  [49.82536,3.33538],
+  [49.8263,3.35072],
+  [49.83353,3.35958],
+  [49.84212,3.36188],
+  [49.84639,3.36819],
+  [49.85034,3.36461],
+  [49.85467,3.36776],
+  [49.86776,3.36755],
+  [49.87804,3.37379],
+  [49.89181,3.37154],
+  [49.89842,3.3668],
+  [49.90261,3.36737],
+  [49.90868,3.36566],
+  [49.92282,3.37109],
+  [49.92825,3.36892],
+  [49.93842,3.36304],
+  [49.95361,3.35699],
+  [49.96608,3.35918],
+  [49.97449,3.37804],
+  [49.97927,3.38834],
+  [49.98427,3.40934],
+  [49.98779,3.42546],
+  [49.9899,3.44576],
+  [49.99095,3.45301],
+  [50.01215,3.46951],
+  [50.02165,3.46953],
+  [50.03015,3.46237],
+  [50.03888,3.46509],
+  [50.04906,3.45149],
+  [50.06019,3.44421],
+  [50.06259,3.44014],
+  [50.07088,3.44426],
+  [50.08023,3.444],
+  [50.08334,3.44816],
+  [50.09201,3.44831],
+  [50.09538,3.45537],
+  [50.09738,3.46612],
+  [50.10369,3.469],
+  [50.10699,3.4708],
+  [50.11175,3.47104],
+  [50.11898,3.46612],
+  [50.12456,3.46333],
+  [50.13808,3.46528],
+  [50.14699,3.46228],
+  [50.15274,3.46602],
+  [50.15716,3.47503],
+  [50.16332,3.48616],
+  [50.16795,3.48801],
+  [50.17445,3.49067],
+  [50.17982,3.49187],
+  [50.18407,3.49297],
+  [50.18683,3.49657],
+  [50.19306,3.4996],
+  [50.20076,3.50944],
+  [50.20988,3.5203],
+  [50.2134,3.52492],
+  [50.22325,3.53676],
+  [50.22829,3.54421],
+  [50.23254,3.54693],
+  [50.23923,3.54824],
+  [50.23597,3.5665],
+  [50.23623,3.58624],
+  [50.23657,3.59169],
+  [50.24097,3.59253],
+  [50.24709,3.59287],
+  [50.2558,3.58873],
+  [50.2584,3.58925],
+  [50.26307,3.58064],
+  [50.27234,3.56983],
+  [50.28037,3.56339],
+  [50.28378,3.56506],
+  [50.28509,3.57026],
+  [50.2899,3.57397],
+  [50.29108,3.57873],
+  [50.29635,3.57706],
+  [50.30582,3.58457],
+  [50.31429,3.5742],
+  [50.32041,3.57448],
+  [50.32691,3.57506],
+  [50.33446,3.57455],
+  [50.3365,3.57674],
+  [50.33451,3.58828],
+  [50.33172,3.59843],
+  [50.3286,3.60723],
+  [50.33451,3.62665],
+  [50.34054,3.63903],
+  [50.34099,3.64463],
+  [50.34414,3.64265],
+  [50.34875,3.63804],
+  [50.36156,3.64598],
+  [50.36667,3.64757],
+  [50.38002,3.65755],
+  [50.39476,3.66321],
+  [50.40233,3.66658],
+  [50.40525,3.68269],
+  [50.4095,3.68574],
+  [50.41242,3.6849],
+  [50.42115,3.68175],
+  [50.42836,3.68014],
+  [50.43244,3.68475],
+  [50.43729,3.69207],
+  [50.45267,3.70033],
+  [50.46256,3.70527],
+  [50.4704,3.71218],
+  [50.47649,3.70877],
+  [50.48516,3.70134],
+  [50.49681,3.70898],
+  [50.50466,3.71527],
+  [50.50859,3.71698],
+  [50.51147,3.72104],
+  [50.51709,3.72456],
+  [50.54797,3.74404],
+  [50.54936,3.75417],
+  [50.55258,3.76659],
+  [50.56417,3.77915],
+  [50.57876,3.79857],
+  [50.58689,3.80775],
+  [50.58754,3.81344],
+  [50.60013,3.8344],
+  [50.60974,3.84135],
+  [50.61376,3.84476],
+  [50.6197,3.85483],
+  [50.63369,3.86249],
+  [50.64472,3.86824],
+  [50.65302,3.87354],
+  [50.65648,3.87742],
+  [50.65991,3.88302],
+  [50.66416,3.89002],
+  [50.66854,3.89738],
+  [50.67088,3.90753],
+  [50.67502,3.91703],
+  [50.67856,3.92789],
+  [50.67886,3.93077],
+  [50.68558,3.92675],
+  [50.69019,3.92787],
+  [50.69729,3.92903],
+  [50.7056,3.9312],
+  [50.70877,3.92961],
+  [50.7162,3.93946],
+  [50.72006,3.93768],
+  [50.72534,3.93435],
+  [50.73021,3.93235],
+  [50.73754,3.92793],
+  [50.74162,3.92654],
+  [50.74368,3.92257],
+  [50.75111,3.9198],
+  [50.74995,3.91225],
+  [50.75008,3.89929],
+  [50.75244,3.89764],
+  [50.7601,3.89073],
+  [50.76272,3.88742],
+  [50.76666,3.88716],
+  [50.7711,3.88568],
+  [50.77252,3.88506],
+  [50.77259,3.88792],
+  [50.77222,3.8901],
+  [50.7742,3.89292],
+  [50.77934,3.90633],
+  [50.78321,3.91255],
+  [50.78797,3.92154],
+  [50.79162,3.93044],
+  [50.79494,3.95083],
+  [50.79683,3.96212],
+  [50.80265,3.96632],
+  [50.8016,3.97707],
+  [50.8054,3.98304],
+  [50.80872,3.98879],
+  [50.81213,3.9928],
+  [50.81754,3.99836],
+  [50.82177,4.00422],
+  [50.82752,4.01359],
+  [50.83061,4.01868],
+  [50.83578,4.02683],
+  [50.84189,4.02123],
+  [50.86462,4.01988],
+  [50.87219,4.01859],
+  [50.87668,4.02005],
+  [50.88414,4.02119],
+  [50.89157,4.02252],
+  [50.89586,4.02649],
+  [50.90266,4.0257],
+  [50.90944,4.02765],
+  [50.91346,4.03235],
+  [50.91534,4.0369],
+  [50.91586,4.04205],
+  [50.91573,4.04554],
+  [50.91948,4.05509],
+  [50.92687,4.05138],
+  [50.93004,4.04921],
+  [50.93511,4.04591],
+  [50.93744,4.04327],
+  [50.94062,4.04258],
+  [50.94184,4.04438],
+  [50.94167,4.05046],
+  [50.94311,4.05747],
+  [50.94352,4.0575],
+  [50.94476,4.06518],
+  [50.94575,4.07586],
+  [50.94993,4.08434],
+  [50.95285,4.09063],
+  [50.94976,4.09968],
+  [50.95013,4.10852],
+  [50.94809,4.11451],
+  [50.95071,4.12762],
+  [50.95174,4.13457],
+  [50.95429,4.14131],
+  [50.95736,4.1444],
+  [50.96171,4.15545],
+  [50.96489,4.16002],
+  [50.96725,4.16498],
+  [50.97171,4.16828],
+  [50.97637,4.16798],
+  [50.98289,4.17049],
+  [50.98605,4.16901],
+  [50.99096,4.17242],
+  [50.99442,4.17395],
+  [50.99746,4.17682],
+  [51.00165,4.17176],
+  [51.0056,4.16435],
+  [51.00718,4.1518],
+  [51.01373,4.14923],
+  [51.01918,4.13384],
+  [51.02062,4.12144],
+  [51.02186,4.11172],
+  [51.0227,4.10569],
+  [51.02712,4.10035],
+  [51.02755,4.09678],
+  [51.02978,4.09908],
+  [51.03205,4.10035],
+  [51.03362,4.10234],
+  [51.03366,4.10758],
+  [51.03757,4.10236],
+  [51.04116,4.10201],
+  [51.04885,4.08895],
+  [51.05381,4.06638],
+  [51.05716,4.05838],
+  [51.06147,4.05494],
+  [51.06407,4.05526],
+  [51.06922,4.0508],
+  [51.06827,4.04462],
+  [51.06818,4.0379],
+  [51.07321,4.03338],
+  [51.07892,4.03408],
+  [51.07876,4.04056],
+  [51.0822,4.0464],
+  [51.08617,4.05833],
+  [51.0934,4.06636],
+  [51.09464,4.07659],
+  [51.09561,4.08852],
+  [51.0925,4.09312],
+  [51.09273,4.09953],
+  [51.09256,4.10788],
+  [51.0955,4.11127],
+  [51.09885,4.12577],
+  [51.10074,4.13346],
+  [51.10031,4.13938],
+  [51.10565,4.14047],
+  [51.1117,4.14255],
+  [51.11408,4.14476],
+  [51.11477,4.16066],
+  [51.11424,4.18008],
+  [51.11816,4.1924],
+  [51.12604,4.20517],
+  [51.12475,4.21231],
+  [51.12408,4.21892],
+  [51.12516,4.22472],
+  [51.12885,4.22922],
+  [51.12973,4.26261],
+  [51.13284,4.27673],
+  [51.14252,4.29417],
+  [51.15054,4.29975],
+  [51.15666,4.30123],
+  [51.16507,4.30885],
+  [51.16955,4.31685],
+  [51.17556,4.32342],
+  [51.18065,4.31758],
+  [51.1902,4.32516],
+  [51.19457,4.32516],
+  [51.20182,4.33876],
+  [51.20165,4.34576],
+  [51.20219,4.35076],
+  [51.20758,4.36706],
+  [51.21438,4.38198],
+  [51.2206,4.38857],
+  [51.22526,4.39925],
+  [51.22802,4.40189],
+  [51.23109,4.4112],
+  [51.23466,4.42013],
+  [51.24455,4.42382],
+  [51.24476,4.42807],
+  [51.24802,4.43215],
+  [51.25472,4.44584],
+  [51.25759,4.46253],
+  [51.26092,4.4642],
+  [51.26813,4.46412],
+  [51.28789,4.48699],
+  [51.29667,4.49809],
+  [51.31287,4.51308],
+  [51.32836,4.52268],
+  [51.33821,4.52821],
+  [51.34722,4.53928],
+  [51.40344,4.60821],
+  [51.40945,4.61567],
+  [51.42217,4.6396],
+  [51.43599,4.64222],
+  [51.44949,4.64074],
+  [51.45505,4.64428],
+  [51.46363,4.65277],
+  [51.46953,4.65844],
+  [51.472,4.6664],
+  [51.47189,4.66827],
+  [51.47268,4.67058],
+  [51.47432,4.67481],
+  [51.47902,4.67157],
+  [51.5153,4.70007],
+  [51.5182,4.70374],
+  [51.5176,4.70691],
+  [51.51133,4.71629],
+  [51.50436,4.72335],
+  [51.50573,4.73041],
+  [51.50255,4.73491],
+  [51.50504,4.74974],
+  [51.50423,4.75929],
+  [51.50453,4.77884],
+  [51.5062,4.78779],
+  [51.50103,4.79693],
+  [51.50161,4.81366],
+  [51.4991,4.83787],
+  [51.50571,4.84325],
+  [51.51133,4.84759],
+  [51.50822,4.85403],
+  [51.50543,4.86124],
+  [51.512,4.86853],
+  [51.51738,4.87568],
+  [51.52406,4.88731],
+  [51.5383,4.91263],
+  [51.5406,4.92215],
+  [51.54253,4.92765],
+  [51.54545,4.94183],
+  [51.55156,4.94524],
+  [51.55347,4.94799],
+  [51.55463,4.95505],
+  [51.55869,4.9673],
+  [51.56422,4.97196],
+  [51.56624,4.97696],
+  [51.56916,4.97874],
+  [51.57944,4.98174],
+  [51.58566,4.98406],
+  [51.59145,4.98526],
+  [51.59654,4.9903],
+  [51.60053,4.98865],
+  [51.60864,4.98773],
+  [51.61049,4.98251],
+  [51.61765,4.96584],
+  [51.61832,4.95126],
+  [51.624,4.94097],
+  [51.62592,4.94069],
+  [51.62811,4.94227],
+  [51.6283,4.9361],
+  [51.62456,4.9323],
+  [51.62298,4.93799],
+  [51.62173,4.93262],
+  [51.62259,4.9266],
+  [51.62516,4.9234],
+  [51.626,4.9175],
+  [51.61939,4.91338],
+  [51.61158,4.9154],
+  [51.60027,4.91801],
+  [51.59118,4.91803],
+  [51.58577,4.91308],
+  [51.5827,4.90741],
+  [51.57935,4.90786],
+  [51.5744,4.89402],
+  [51.57317,4.88229],
+  [51.57347,4.87169],
+  [51.56959,4.87085],
+  [51.5674,4.86553],
+  [51.56875,4.84819],
+  [51.56549,4.84542],
+  [51.5651,4.83849],
+  [51.56394,4.83622],
+  [51.56684,4.82899],
+  [51.56817,4.82476],
+  [51.56839,4.82019],
+  [51.5654,4.80914],
+  [51.56485,4.79669],
+  [51.56796,4.78437],
+  [51.57334,4.78319],
+  [51.56991,4.77665],
+  [51.56656,4.77551],
+  [51.563,4.75746],
+  [51.56292,4.75709],
+  [51.56315,4.7509],
+  [51.5689,4.74315],
+  [51.57388,4.7441],
+  [51.57736,4.73704],
+  [51.57768,4.71663],
+  [51.57384,4.69502],
+  [51.57322,4.67719],
+  [51.56991,4.66554],
+  [51.57244,4.66456],
+  [51.57122,4.65329],
+  [51.57045,4.63964],
+  [51.5712,4.63752],
+  [51.56774,4.63535],
+  [51.5624,4.64331],
+  [51.55787,4.64121],
+  [51.55513,4.63119],
+  [51.55017,4.63597],
+  [51.5395,4.61649],
+  [51.53946,4.61057],
+  [51.53815,4.59958],
+  [51.54186,4.59319],
+  [51.5465,4.59119],
+  [51.55034,4.58668],
+  [51.55495,4.58445],
+  [51.56137,4.58141],
+  [51.56424,4.58881],
+  [51.57397,4.59117],
+  [51.57755,4.58984],
+  [51.58019,4.58769],
+  [51.57948,4.57924],
+  [51.57991,4.57392],
+  [51.57796,4.56469],
+  [51.57555,4.55446],
+  [51.57375,4.54538],
+  [51.5753,4.5372],
+  [51.58184,4.52731],
+  [51.58532,4.52871],
+  [51.58879,4.52731],
+  [51.58969,4.51238],
+  [51.58796,4.50178],
+  [51.5848,4.49444],
+  [51.58577,4.48974],
+  [51.58358,4.47693],
+  [51.58364,4.46802],
+  [51.58568,4.46236],
+  [51.58778,4.4597],
+  [51.58665,4.45547],
+  [51.58298,4.4547],
+  [51.58178,4.46004],
+  [51.57572,4.4641],
+  [51.56946,4.46968],
+  [51.56156,4.47418],
+  [51.55613,4.47495],
+  [51.55298,4.47352],
+  [51.54712,4.47386],
+  [51.54392,4.4744],
+  [51.53714,4.47648],
+  [51.53202,4.47566],
+  [51.52693,4.48352],
+  [51.52112,4.48266],
+  [51.51897,4.47315],
+  [51.52414,4.47114],
+  [51.5265,4.46579],
+  [51.53124,4.46043],
+  [51.53311,4.45412],
+  [51.52832,4.44674],
+  [51.52659,4.43745],
+  [51.5209,4.43936],
+  [51.51758,4.43026],
+  [51.5147,4.4271],
+  [51.50891,4.42007],
+  [51.50296,4.40962],
+  [51.49856,4.3991],
+  [51.49423,4.39837],
+  [51.48105,4.39758],
+  [51.46088,4.39417],
+  [51.45058,4.3814],
+  [51.44009,4.37734],
+  [51.43689,4.37398],
+  [51.43179,4.37666],
+  [51.42711,4.36706],
+  [51.42104,4.36067],
+  [51.41434,4.35582],
+  [51.40887,4.34938],
+  [51.39733,4.35556],
+  [51.39211,4.35428],
+  [51.3914,4.33818],
+  [51.39516,4.32958],
+  [51.40104,4.33793],
+  [51.40323,4.3425],
+  [51.4102,4.33891],
+  [51.41666,4.33486],
+  [51.42314,4.33569],
+  [51.4226,4.32342],
+  [51.42876,4.31894],
+  [51.44131,4.31552],
+  [51.44337,4.31267],
+  [51.44614,4.31188],
+  [51.45011,4.3128],
+  [51.46537,4.30892],
+  [51.47277,4.304],
+  [51.47942,4.30102],
+  [51.47777,4.299],
+  [51.47601,4.29381],
+  [51.47466,4.28548],
+  [51.48069,4.28001],
+  [51.485,4.28229],
+  [51.48979,4.28566],
+  [51.49152,4.2886],
+  [51.49412,4.28718],
+  [51.49897,4.28297],
+  [51.50135,4.27975],
+  [51.51193,4.27877],
+  [51.52054,4.27536],
+  [51.52142,4.27342],
+  [51.53024,4.26915],
+  [51.54081,4.27106],
+  [51.5474,4.2702],
+  [51.55212,4.27694],
+  [51.56279,4.2863],
+  [51.57491,4.28658],
+  [51.57289,4.31385],
+  [51.57946,4.31703],
+  [51.58137,4.31591],
+  [51.58714,4.31855],
+  [51.58847,4.33084],
+  [51.58886,4.33263],
+  [51.59854,4.34033],
+  [51.60677,4.34767],
+  [51.62785,4.36344],
+  [51.63422,4.36752],
+  [51.63639,4.37198],
+  [51.64057,4.37945],
+  [51.64381,4.3896],
+  [51.64724,4.39391],
+  [51.64928,4.40412],
+  [51.65718,4.41028],
+  [51.65334,4.42002],
+  [51.66046,4.42946],
+  [51.67531,4.43313],
+  [51.67758,4.4338],
+  [51.68409,4.44122],
+  [51.68763,4.4438],
+  [51.69018,4.44142],
+  [51.69194,4.43813],
+  [51.69447,4.44],
+  [51.69627,4.43951],
+  [51.69636,4.43026],
+  [51.69209,4.417],
+  [51.68486,4.41874],
+  [51.69359,4.40142],
+  [51.70188,4.39595],
+  [51.70992,4.3973],
+  [51.72996,4.40998],
+  [51.72599,4.42395],
+  [51.72636,4.43715],
+  [51.73818,4.43987],
+  [51.74558,4.44137],
+  [51.74979,4.44279],
+  [51.7567,4.44496],
+  [51.76623,4.44393],
+  [51.76889,4.44144],
+  [51.77429,4.41573],
+  [51.77794,4.40238],
+  [51.80869,4.41223],
+  [51.81322,4.41369],
+  [51.81766,4.41515],
+  [51.82487,4.41213],
+  [51.82676,4.41341],
+  [51.82343,4.42824],
+  [51.82184,4.43747],
+  [51.82554,4.43955],
+  [51.82318,4.45182],
+  [51.82032,4.47792],
+  [51.82082,4.48422],
+  [51.82478,4.4821],
+  [51.82272,4.4901],
+  [51.82712,4.50763],
+  [51.83631,4.51538],
+  [51.84365,4.5218],
+  [51.84136,4.53647],
+  [51.84622,4.53643],
+  [51.85137,4.53639],
+  [51.85691,4.53647],
+  [51.85869,4.53272],
+  [51.85894,4.5251],
+  [51.85828,4.51577],
+  [51.85907,4.50907],
+  [51.86195,4.50701],
+  [51.86738,4.50298],
+  [51.87272,4.50154],
+  [51.87639,4.50356],
+  [51.88201,4.513],
+  [51.88287,4.52107],
+  [51.8913,4.52034],
+  [51.89858,4.51441],
+  [51.90145,4.5119],
+  [51.90624,4.49845],
+  [51.90813,4.48952],
+  [51.91564,4.48212],
+  [51.92089,4.47977],
+  [51.92243,4.47897],
+];
+
+
+const WISSELPUNTEN = ROUTE.filter(p => ["start","wp","finish"].includes(p.type));
 
 function pad(n) { return String(n).padStart(2, "0"); }
+
 function formatDuur(ms) {
   if (ms <= 0) return "—";
-  const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000);
-  return `${h}u ${pad(m)}m`;
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  return h + "u " + pad(m) + "m";
 }
+
 function calcEtaMs(vanKm, naarKm, snelheid) {
   if (!snelheid || snelheid <= 0 || naarKm <= vanKm) return null;
   return Date.now() + ((naarKm - vanKm) / snelheid) * 3600000;
 }
+
 function formatEta(ms) {
   if (!ms) return null;
   const d = new Date(ms);
-  return `${["zo","ma","di","wo","do","vr","za"][d.getDay()]} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const dagen = ["zo","ma","di","wo","do","vr","za"];
+  return dagen[d.getDay()] + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
 }
 
 const STIJL = {
@@ -253,42 +1137,163 @@ const STIJL = {
   toilet: { kleur: "#a3e635", icon: "🚽", label: "Toilet" },
 };
 
-// ── PIN SCHERM ────────────────────────────────────────────────────────────────
+// ── KAART ─────────────────────────────────────────────────────────────────────
+function RouteKaart({ huidigKm, snelheid, gpsData }) {
+  const mapRef = useRef(null);
+  const kaartRef = useRef(null);
+  const gereenRef = useRef(null);
+  const markerRef = useRef(null);
+  const animKmRef = useRef(0);
+  const animTimerRef = useRef(null);
+
+  // Initialiseer kaart
+  useEffect(function() {
+    if (kaartRef.current || !mapRef.current) return;
+    const map = L.map(mapRef.current, { zoomControl: true }).setView([50.5, 4.0], 6);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap" }).addTo(map);
+
+    // Blauwe route lijn via exacte GPX route
+    L.polyline(GPX_ROUTE, { color: "#3b82f6", weight: 3, opacity: 0.7 }).addTo(map);
+
+    // Markers voor wisselpunten en checkpoints
+    KAART_PUNTEN.forEach(function(p) {
+      const kleuren = { start: "#f59e0b", wp: "#4ade80", finish: "#3b82f6", cp: "#fde047", door: "#93c5fd" };
+      const kleur = kleuren[p.type] || "#94a3b8";
+      const groot = ["wp","start","finish"].includes(p.type);
+      const med = p.type === "cp";
+      const s = groot ? 14 : med ? 10 : 6;
+      const icon = L.divIcon({
+        className: "",
+        html: '<div style="width:' + s + 'px;height:' + s + 'px;background:' + kleur + ';border-radius:50%;border:2px solid rgba(255,255,255,0.8);box-shadow:0 1px 4px rgba(0,0,0,0.5)"></div>',
+        iconSize: [s, s], iconAnchor: [s/2, s/2]
+      });
+      L.marker([p.lat, p.lon], { icon: icon }).addTo(map).bindPopup("<b>" + p.naam + "</b>");
+    });
+
+    kaartRef.current = map;
+  }, []);
+
+  // Interpoleer lat/lon op basis van km positie
+  function kmNaarCoord(km) {
+    const idx = Math.min(Math.round((km / TOTAL_KM) * GPX_ROUTE.length), GPX_ROUTE.length - 1);
+    return GPX_ROUTE[Math.max(0, idx)];
+  }
+
+  // Update groene lijn en marker
+  function updateKaart(km) {
+    if (!kaartRef.current) return;
+    const map = kaartRef.current;
+
+    // Groene lijn over gereden deel
+    if (gereenRef.current) { map.removeLayer(gereenRef.current); gereenRef.current = null; }
+    if (km > 0) {
+      const n = Math.min(Math.round((km / TOTAL_KM) * GPX_ROUTE.length) + 1, GPX_ROUTE.length);
+      const gereden = GPX_ROUTE.slice(0, n);
+      if (gereden.length > 1) {
+        gereenRef.current = L.polyline(gereden, { color: "#4ade80", weight: 4, opacity: 0.9 }).addTo(map);
+      }
+    }
+
+    // Oranje live marker - gebruik exacte GPS als beschikbaar
+    if (markerRef.current) { map.removeLayer(markerRef.current); markerRef.current = null; }
+    if (km > 0) {
+      const pos = (gpsData && gpsData.lat && gpsData.lon)
+        ? [parseFloat(gpsData.lat), parseFloat(gpsData.lon)]
+        : kmNaarCoord(km);
+      if (pos) {
+        const isExactGPS = gpsData && gpsData.lat;
+        const icon = L.divIcon({
+          className: "",
+          html: '<div style="width:18px;height:18px;background:' + (isExactGPS ? '#e65100' : '#f59e0b') + ';border-radius:50%;border:3px solid white;box-shadow:0 0 0 5px rgba(230,81,0,0.35)"></div>',
+          iconSize: [18, 18], iconAnchor: [9, 9]
+        });
+        markerRef.current = L.marker(pos, { icon: icon }).addTo(map)
+          .bindPopup("<b>" + (isExactGPS ? "🛰️ GPS positie" : "📍 Geschatte positie") + " · " + km.toFixed(1) + " km</b>");
+      }
+    }
+  }
+
+  // Start animatie: marker loopt automatisch mee op basis van snelheid
+  useEffect(function() {
+    if (animTimerRef.current) { clearInterval(animTimerRef.current); animTimerRef.current = null; }
+    if (huidigKm <= 0) return;
+
+    // Reset naar laatste bekende checkpoint
+    animKmRef.current = huidigKm;
+    updateKaart(huidigKm);
+
+    // Centreer kaart op huidige positie
+    const pos = kmNaarCoord(huidigKm);
+    if (pos && kaartRef.current) kaartRef.current.setView(pos, 12);
+
+    // Beweeg elke 10 sec vooruit (snelheid km/h → km per 10 sec)
+    const stapKm = (snelheid || 11) / 360;
+    animTimerRef.current = setInterval(function() {
+      animKmRef.current = Math.min(animKmRef.current + stapKm, TOTAL_KM);
+      updateKaart(animKmRef.current);
+    }, 10000);
+
+    return function() { if (animTimerRef.current) clearInterval(animTimerRef.current); };
+  }, [huidigKm, snelheid, gpsData]);
+
+  return (
+    <div style={{ margin: "12px 16px 0", borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255,255,255,0.1)" }}>
+      <div style={{ background: "#1a2530", padding: "8px 14px", fontSize: 11, color: "rgba(255,255,255,0.5)", display: "flex", gap: 12, alignItems: "center" }}>
+        <span>Route kaart · exacte GPX route</span>
+        <span style={{ marginLeft: "auto", display: "flex", gap: 10, alignItems: "center" }}>
+          <span style={{ display: "flex", gap: 4, alignItems: "center" }}>
+            <span style={{ width: 12, height: 3, background: "#3b82f6", display: "inline-block", borderRadius: 2 }}></span>
+            <span>Route</span>
+          </span>
+          <span style={{ display: "flex", gap: 4, alignItems: "center" }}>
+            <span style={{ width: 12, height: 3, background: "#4ade80", display: "inline-block", borderRadius: 2 }}></span>
+            <span>Gereden</span>
+          </span>
+          <span style={{ display: "flex", gap: 4, alignItems: "center" }}>
+            <span style={{ width: 12, height: 12, background: "#e65100", display: "inline-block", borderRadius: "50%" }}></span>
+            <span>Nu</span>
+          </span>
+        </span>
+      </div>
+      <div ref={mapRef} style={{ height: 300, width: "100%" }} />
+    </div>
+  );
+}
+
+// ── PIN ───────────────────────────────────────────────────────────────────────
 function PinScherm({ onSuccess }) {
   const [pin, setPin] = useState("");
   const [fout, setFout] = useState(false);
 
-  function drukKnop(k) {
-    if (k === "⌫") { setPin(p => p.slice(0,-1)); setFout(false); return; }
+  function druk(k) {
+    if (k === "X") { setPin(function(p) { return p.slice(0,-1); }); setFout(false); return; }
     const nieuw = pin + k;
     setPin(nieuw);
     if (nieuw.length === 4) {
       if (nieuw === TEAM_PIN) { onSuccess(); }
-      else { setFout(true); setTimeout(() => { setPin(""); setFout(false); }, 600); }
+      else { setFout(true); setTimeout(function() { setPin(""); setFout(false); }, 600); }
     }
   }
 
   return (
-    <div style={{ fontFamily: "-apple-system,BlinkMacSystemFont,sans-serif", background: "#0f1923", minHeight: "100vh", color: "white", maxWidth: 430, margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32 }}>
+    <div style={{ fontFamily: "-apple-system,sans-serif", background: "#0f1923", minHeight: "100vh", color: "white", maxWidth: 430, margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32 }}>
       <div style={{ fontSize: 32, marginBottom: 8 }}>🔒</div>
       <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>Team App</div>
       <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 40 }}>Voer de pincode in</div>
-
-      {/* Dots */}
       <div style={{ display: "flex", gap: 16, marginBottom: 40 }}>
-        {[0,1,2,3].map(i => (
-          <div key={i} style={{ width: 18, height: 18, borderRadius: "50%", background: fout ? "#ef4444" : pin.length > i ? "#4ade80" : "rgba(255,255,255,0.15)", transition: "background 0.15s", transform: fout ? "scale(1.2)" : "scale(1)" }} />
-        ))}
+        {[0,1,2,3].map(function(i) {
+          return <div key={i} style={{ width: 18, height: 18, borderRadius: "50%", background: fout ? "#ef4444" : pin.length > i ? "#4ade80" : "rgba(255,255,255,0.15)", transition: "background 0.15s" }} />;
+        })}
       </div>
-
-      {/* Numpad */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, width: "100%", maxWidth: 280 }}>
-        {["1","2","3","4","5","6","7","8","9","","0","⌫"].map((k, i) => (
-          k === "" ? <div key={i} /> :
-          <button key={i} onClick={() => drukKnop(k)} style={{ padding: "18px 0", fontSize: k === "⌫" ? 20 : 22, fontWeight: 600, borderRadius: 14, border: "none", background: k === "⌫" ? "#1a2530" : "#1e3a2e", color: "white", cursor: "pointer", fontFamily: "inherit", transition: "transform 0.1s", active: "transform: scale(0.95)" }}>
-            {k}
-          </button>
-        ))}
+        {["1","2","3","4","5","6","7","8","9","","0","X"].map(function(k, i) {
+          if (k === "") return <div key={i} />;
+          return (
+            <button key={i} onClick={function() { druk(k); }} style={{ padding: "18px 0", fontSize: k === "X" ? 20 : 22, fontWeight: 600, borderRadius: 14, border: "none", background: k === "X" ? "#1a2530" : "#1e3a2e", color: "white", cursor: "pointer", fontFamily: "inherit" }}>
+              {k === "X" ? "⌫" : k}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -304,102 +1309,100 @@ function TeamApp({ onSwitch }) {
   const [filter, setFilter] = useState("wp");
   const [zoek, setZoek] = useState("");
 
-  if (!ingelogd) return <PinScherm onSuccess={() => setIngelogd(true)} />;
+  if (!ingelogd) return <PinScherm onSuccess={function() { setIngelogd(true); }} />;
 
   function nowStr() { return new Date().toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit", second: "2-digit" }); }
-  function addLog(msg, t) { setLog(p => [{ msg, t, time: nowStr() }, ...p].slice(0, 10)); }
-  function showToast(msg) { setToast(msg); setTimeout(() => setToast(""), 3000); }
+  function addLog(msg, t) { setLog(function(p) { return [{ msg: msg, t: t, time: nowStr() }, ...p].slice(0, 10); }); }
+  function showToast(msg) { setToast(msg); setTimeout(function() { setToast(""); }, 3000); }
 
   function bevestig() {
     if (!sel) { showToast("Kies eerst een punt"); return; }
     setLoading(true);
-    const url = SCRIPT_URL + '?type=checkpoint&team=HW-Runners&checkpoint=' + encodeURIComponent(sel.naam) + '&km=' + sel.km + '&timestamp=' + encodeURIComponent(new Date().toISOString());
+    const url = SCRIPT_URL + "?type=checkpoint&team=HW-Runners&checkpoint=" + encodeURIComponent(sel.naam) + "&km=" + sel.km + "&timestamp=" + encodeURIComponent(new Date().toISOString());
     fetch(url)
-      .then(r => r.json())
-      .then(data => { if (data.ok) { addLog(`✓ ${sel.naam} (${sel.km} km)`, "ok"); showToast(`✓ ${sel.naam} gelogd!`); setLoading(false); setSel(null); } else { throw new Error(); } })
-      .catch(() => { addLog("Versturen mislukt — check verbinding", "err"); setLoading(false); });
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        addLog("✓ " + sel.naam + " (" + sel.km + " km)", "ok");
+        showToast("✓ Gelogd!");
+        setLoading(false);
+        setSel(null);
+      })
+      .catch(function() { addLog("Versturen mislukt", "err"); setLoading(false); });
   }
 
   const toonTypes = {
-    wp:    ["start","wp","finish"],
-    cp:    ["start","wp","finish","cp"],
-    rbr:   ["start","wp","finish","rbr"],
+    wp: ["start","wp","finish"],
+    cp: ["start","wp","finish","cp"],
+    rbr: ["start","wp","finish","rbr"],
     alles: ["start","wp","finish","cp","rbr","door","toilet"],
   };
 
-  const zichtbaar = ROUTE.filter(p => {
-    if (!toonTypes[filter]?.includes(p.type)) return false;
+  const zichtbaar = ROUTE.filter(function(p) {
+    if (!toonTypes[filter] || !toonTypes[filter].includes(p.type)) return false;
     if (zoek && !p.naam.toLowerCase().includes(zoek.toLowerCase())) return false;
     return true;
   });
 
   return (
-    <div style={{ fontFamily: "-apple-system,BlinkMacSystemFont,sans-serif", background: "#0f1923", minHeight: "100vh", color: "white", maxWidth: 430, margin: "0 auto", paddingBottom: 40 }}>
+    <div style={{ fontFamily: "-apple-system,sans-serif", background: "#0f1923", minHeight: "100vh", color: "white", maxWidth: 430, margin: "0 auto", paddingBottom: 40 }}>
       <div style={{ background: "linear-gradient(135deg,#1a3a2a,#0f2a1a)", padding: "44px 20px 16px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div style={{ fontSize: 11, color: "#4ade80", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 4 }}>HW-Runners · Roparun 2026</div>
-            <div style={{ fontSize: 22, fontWeight: 700 }}>Team App 📱</div>
+            <div style={{ fontSize: 22, fontWeight: 700 }}>Team App</div>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>Geef door bij welk punt je bent</div>
           </div>
-          <button onClick={() => setIngelogd(false)} style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 99, padding: "6px 12px", color: "rgba(255,255,255,0.4)", fontSize: 12, cursor: "pointer" }}>🔒 Slot</button>
+          <button onClick={function() { setIngelogd(false); }} style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 99, padding: "6px 12px", color: "rgba(255,255,255,0.4)", fontSize: 12, cursor: "pointer" }}>🔒 Slot</button>
         </div>
       </div>
 
       <div style={{ padding: "14px 16px 0" }}>
-        {/* Filter tabs */}
         <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
-          {[["wp","Wisselpunten"],["cp","+ Checkpoints"],["rbr","+ RBR"],["alles","Alles"]].map(([k,l]) => (
-            <button key={k} onClick={() => setFilter(k)} style={{ padding: "5px 12px", borderRadius: 99, border: "none", fontSize: 12, fontWeight: 500, cursor: "pointer", background: filter === k ? "#4ade80" : "#1a2530", color: filter === k ? "#0a2e14" : "rgba(255,255,255,0.6)" }}>{l}</button>
-          ))}
+          {[["wp","Wisselpunten"],["cp","+ Checkpoints"],["rbr","+ RBR"],["alles","Alles"]].map(function(item) {
+            return (
+              <button key={item[0]} onClick={function() { setFilter(item[0]); }} style={{ padding: "5px 12px", borderRadius: 99, border: "none", fontSize: 12, fontWeight: 500, cursor: "pointer", background: filter === item[0] ? "#4ade80" : "#1a2530", color: filter === item[0] ? "#0a2e14" : "rgba(255,255,255,0.6)" }}>{item[1]}</button>
+            );
+          })}
         </div>
-
-        {/* Zoek */}
-        <input value={zoek} onChange={e => setZoek(e.target.value)} placeholder="Zoek plaats of punt…" style={{ width: "100%", padding: "9px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "#1a2530", color: "white", fontSize: 14, outline: "none", fontFamily: "inherit", marginBottom: 10 }} />
-
-        {/* Lijst */}
-        <div style={{ background: "#1a2530", borderRadius: 14, overflow: "hidden", marginBottom: 14, maxHeight: 420, overflowY: "auto" }}>
-          {zichtbaar.map((p, i) => {
-            const s = STIJL[p.type];
-            const selected = sel?.km === p.km && sel?.naam === p.naam;
+        <input value={zoek} onChange={function(e) { setZoek(e.target.value); }} placeholder="Zoek plaats of punt…" style={{ width: "100%", padding: "9px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "#1a2530", color: "white", fontSize: 14, outline: "none", fontFamily: "inherit", marginBottom: 10 }} />
+        <div style={{ background: "#1a2530", borderRadius: 14, overflow: "hidden", marginBottom: 14, maxHeight: 380, overflowY: "auto" }}>
+          {zichtbaar.map(function(p, i) {
+            const s = STIJL[p.type] || STIJL.door;
+            const selected = sel && sel.km === p.km && sel.naam === p.naam;
             const isWP = ["start","wp","finish"].includes(p.type);
             return (
-              <div key={i} onClick={() => setSel(selected ? null : p)} style={{ padding: isWP ? "13px 16px" : "9px 16px", borderBottom: i < zichtbaar.length-1 ? "1px solid rgba(255,255,255,0.05)" : "none", display: "flex", alignItems: "center", gap: 12, background: selected ? "rgba(74,222,128,0.12)" : "transparent", cursor: "pointer" }}>
-                <div style={{ width: isWP ? 32 : 24, height: isWP ? 32 : 24, borderRadius: "50%", background: selected ? s.kleur : isWP ? "#1e3a2e" : "rgba(255,255,255,0.05)", border: selected ? `2px solid ${s.kleur}` : isWP ? "1px solid rgba(255,255,255,0.15)" : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: isWP ? 14 : 11, flexShrink: 0 }}>{s.icon}</div>
+              <div key={i} onClick={function() { setSel(selected ? null : p); }} style={{ padding: isWP ? "13px 16px" : "9px 16px", borderBottom: i < zichtbaar.length-1 ? "1px solid rgba(255,255,255,0.05)" : "none", display: "flex", alignItems: "center", gap: 12, background: selected ? "rgba(74,222,128,0.12)" : "transparent", cursor: "pointer" }}>
+                <div style={{ width: isWP ? 32 : 22, height: isWP ? 32 : 22, borderRadius: "50%", background: selected ? s.kleur : isWP ? "#1e3a2e" : "rgba(255,255,255,0.05)", border: selected ? "2px solid " + s.kleur : isWP ? "1px solid rgba(255,255,255,0.15)" : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: isWP ? 14 : 11, flexShrink: 0 }}>{s.icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: isWP ? 14 : 12, fontWeight: isWP ? 600 : 400, color: selected ? "#4ade80" : isWP ? "white" : "rgba(255,255,255,0.55)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.naam}</div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", marginTop: 1 }}>{p.km} km{p.tijd ? ` · ${p.tijd}` : ""}{p.team ? ` · ${p.team}` : ""}</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", marginTop: 1 }}>{p.km} km{p.tijd ? " · " + p.tijd : ""}{p.team ? " · " + p.team : ""}</div>
                 </div>
                 {selected && <div style={{ color: "#4ade80", fontSize: 18, flexShrink: 0 }}>✓</div>}
               </div>
             );
           })}
         </div>
-
-        {/* Bevestig knop */}
-        <button onClick={bevestig} disabled={loading || !sel} style={{ width: "100%", padding: 16, fontSize: 16, fontWeight: 700, borderRadius: 14, border: "none", background: !sel ? "#1a2530" : loading ? "#1a3a2a" : "linear-gradient(135deg,#16a34a,#4ade80)", color: !sel ? "rgba(255,255,255,0.3)" : "#000", cursor: !sel ? "default" : "pointer", marginBottom: 14, transition: "all 0.2s" }}>
-          {loading ? "Versturen…" : sel ? `✓ Bevestig: ${sel.naam}` : "Selecteer een punt hierboven"}
+        <button onClick={bevestig} disabled={loading || !sel} style={{ width: "100%", padding: 16, fontSize: 16, fontWeight: 700, borderRadius: 14, border: "none", background: !sel ? "#1a2530" : loading ? "#1a3a2a" : "linear-gradient(135deg,#16a34a,#4ade80)", color: !sel ? "rgba(255,255,255,0.3)" : "#000", cursor: !sel ? "default" : "pointer", marginBottom: 14 }}>
+          {loading ? "Versturen…" : sel ? "✓ Bevestig: " + sel.naam : "Selecteer een punt hierboven"}
         </button>
-
-        {/* Log */}
         {log.length > 0 && (
           <div style={{ background: "#1a2530", borderRadius: 14, overflow: "hidden", marginBottom: 14 }}>
             <div style={{ padding: "8px 16px 4px", fontSize: 10, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Log</div>
-            {log.map((l, i) => (
-              <div key={i} style={{ padding: "8px 16px", borderTop: "1px solid rgba(255,255,255,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: 12, color: l.t === "ok" ? "#4ade80" : "#f87171" }}>{l.msg}</span>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", flexShrink: 0, marginLeft: 8 }}>{l.time}</span>
-              </div>
-            ))}
+            {log.map(function(l, i) {
+              return (
+                <div key={i} style={{ padding: "8px 16px", borderTop: "1px solid rgba(255,255,255,0.05)", display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 12, color: l.t === "ok" ? "#4ade80" : "#f87171" }}>{l.msg}</span>
+                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", flexShrink: 0, marginLeft: 8 }}>{l.time}</span>
+                </div>
+              );
+            })}
           </div>
         )}
-
         <div style={{ textAlign: "center" }}>
           <button onClick={onSwitch} style={{ background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 99, padding: "8px 20px", fontSize: 13, color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>👀 Supporter-tracker</button>
         </div>
       </div>
-
-      {toast && <div style={{ position: "fixed", bottom: 30, left: "50%", transform: "translateX(-50%)", background: "#16a34a", color: "white", padding: "12px 24px", borderRadius: 99, fontSize: 14, fontWeight: 600, zIndex: 100, whiteSpace: "nowrap", boxShadow: "0 8px 30px rgba(0,0,0,0.4)" }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", bottom: 30, left: "50%", transform: "translateX(-50%)", background: "#16a34a", color: "white", padding: "12px 24px", borderRadius: 99, fontSize: 14, fontWeight: 600, zIndex: 100, whiteSpace: "nowrap" }}>{toast}</div>}
     </div>
   );
 }
@@ -407,38 +1410,64 @@ function TeamApp({ onSwitch }) {
 // ── SUPPORTER TRACKER ─────────────────────────────────────────────────────────
 function SupporterTracker({ onSwitch }) {
   const [checkpoints, setCheckpoints] = useState([]);
+  const [gpsData, setGpsData] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
   const [filter, setFilter] = useState("belangrijk");
   const [zoek, setZoek] = useState("");
 
-  useEffect(() => { fetchData(); const t = setInterval(fetchData, 30000); return () => clearInterval(t); }, []);
+  useEffect(function() {
+    fetchData();
+    const t = setInterval(fetchData, 30000);
+    return function() { clearInterval(t); };
+  }, []);
 
   function fetchData() {
     fetch(SCRIPT_URL + "?type=checkpoints")
-      .then(r => r.json())
-      .then(data => {
-        if (data.checkpoints?.length > 1) {
-          setCheckpoints(data.checkpoints.slice(1).map(r => ({ timestamp: r[0], naam: r[2], km: parseFloat(r[3]) || 0 })));
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.checkpoints && data.checkpoints.length > 1) {
+          setCheckpoints(data.checkpoints.slice(1).map(function(r) {
+            return { timestamp: r[0], naam: r[2], km: parseFloat(r[3]) || 0 };
+          }));
         } else {
           setCheckpoints([]);
         }
+        // GPS data verwerken
+        if (data.gps && data.gps.lat) {
+          setGpsData(data.gps);
+        } else {
+          setGpsData(null);
+        }
         setLastUpdate(new Date());
-      }).catch(() => {});
+      }).catch(function() {});
   }
 
-  const huidigKm = checkpoints.length > 0 ? Math.max(...checkpoints.map(c => c.km)) : 0;
+  // GPS status bepalen
+  const gpsStatus = (function() {
+    if (!gpsData || !gpsData.lat) return "geen";
+    const oud = (Date.now() - new Date(gpsData.timestamp).getTime()) / 60000;
+    if (oud < 10) return "live";
+    if (oud < 30) return "vertraagd";
+    return "oud";
+  })();
+
+  // Effectieve km positie: GPS heeft voorrang op checkpoint
+  const checkpointKm = checkpoints.length > 0 ? Math.max.apply(null, checkpoints.map(function(c) { return c.km; })) : 0;
+  const gpsKm = (gpsData && gpsData.km) ? parseFloat(gpsData.km) : 0;
+  const huidigKm = (gpsStatus === "live" || gpsStatus === "vertraagd") ? Math.max(gpsKm, checkpointKm) : checkpointKm;
+  const gebruiktGPS = gpsStatus === "live" || gpsStatus === "vertraagd";
   const pct = Math.min(100, Math.round((huidigKm / TOTAL_KM) * 100));
 
   let snelheid = DEFAULT_SPEED;
   if (checkpoints.length >= 2) {
-    const sorted = [...checkpoints].sort((a,b) => a.km - b.km);
-    const dtMs = new Date(sorted.at(-1).timestamp) - new Date(sorted[0].timestamp);
-    const dKm = sorted.at(-1).km - sorted[0].km;
+    const sorted = checkpoints.slice().sort(function(a,b) { return a.km - b.km; });
+    const dtMs = new Date(sorted[sorted.length-1].timestamp) - new Date(sorted[0].timestamp);
+    const dKm = sorted[sorted.length-1].km - sorted[0].km;
     if (dtMs > 0 && dKm > 0) snelheid = dKm / (dtMs / 3600000);
   }
 
-  const huidigPunt = ROUTE.filter(p => p.km <= huidigKm).at(-1) || ROUTE[0];
-  const volgendWP = ROUTE.filter(p => ["wp","finish"].includes(p.type) && p.km > huidigKm)[0];
+  const huidigPunt = ROUTE.filter(function(p) { return p.km <= huidigKm; }).slice(-1)[0] || ROUTE[0];
+  const volgendWP = ROUTE.filter(function(p) { return ["wp","finish"].includes(p.type) && p.km > huidigKm; })[0];
   const looptijdMs = huidigKm > 0 ? Date.now() - STARTMS : 0;
 
   const toonTypes = {
@@ -448,101 +1477,104 @@ function SupporterTracker({ onSwitch }) {
     alles: ["start","wp","finish","cp","rbr","door","toilet"],
   };
 
-  const zichtbaar = ROUTE.filter(p => {
-    if (!toonTypes[filter]?.includes(p.type)) return false;
+  const zichtbaar = ROUTE.filter(function(p) {
+    if (!toonTypes[filter] || !toonTypes[filter].includes(p.type)) return false;
     if (zoek && !p.naam.toLowerCase().includes(zoek.toLowerCase())) return false;
     return true;
   });
 
   return (
-    <div style={{ fontFamily: "-apple-system,BlinkMacSystemFont,sans-serif", background: "#0f1923", minHeight: "100vh", color: "white", maxWidth: 430, margin: "0 auto", paddingBottom: 40 }}>
-      {/* Header */}
+    <div style={{ fontFamily: "-apple-system,sans-serif", background: "#0f1923", minHeight: "100vh", color: "white", maxWidth: 430, margin: "0 auto", paddingBottom: 40 }}>
       <div style={{ background: "linear-gradient(135deg,#0a1f2e,#0f2a1a)", padding: "44px 20px 16px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
           <div>
             <div style={{ fontSize: 11, color: "#4ade80", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 4 }}>HW-Runners · Live</div>
-            <div style={{ fontSize: 22, fontWeight: 700 }}>Roparun 2026 🏃</div>
+            <div style={{ fontSize: 22, fontWeight: 700 }}>Roparun 2026</div>
           </div>
           <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{lastUpdate ? `${pad(lastUpdate.getHours())}:${pad(lastUpdate.getMinutes())}` : "—"}</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{lastUpdate ? pad(lastUpdate.getHours()) + ":" + pad(lastUpdate.getMinutes()) : "—"}</div>
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#4ade80", marginTop: 4, marginLeft: "auto", animation: "pulse 2s infinite" }} />
           </div>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 5 }}>
-          <span>Clastres</span><span style={{ color: "#4ade80", fontWeight: 600 }}>{pct}% · {huidigKm} km</span><span>Rotterdam</span>
+          <span>Clastres</span>
+          <span style={{ color: "#4ade80", fontWeight: 600 }}>{pct}% · {huidigKm} km</span>
+          <span>Rotterdam</span>
         </div>
         <div style={{ height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 3, overflow: "hidden" }}>
-          <div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg,#16a34a,#4ade80)", borderRadius: 3, transition: "width 0.8s" }} />
+          <div style={{ height: "100%", width: pct + "%", background: "linear-gradient(90deg,#16a34a,#4ade80)", borderRadius: 3, transition: "width 0.8s" }} />
         </div>
       </div>
 
-      {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, padding: "12px 16px 0" }}>
         {[
-          { val: `${huidigKm}`, sub: `/${TOTAL_KM}km`, lbl: "Afstand" },
-          { val: `${snelheid.toFixed(1)}`, sub: "km/h", lbl: "Snelheid" },
+          { val: huidigKm, sub: "/" + TOTAL_KM + "km", lbl: "Afstand" },
+          { val: snelheid.toFixed(1), sub: "km/h", lbl: "Snelheid" },
           { val: formatDuur(looptijdMs), sub: "", lbl: "Onderweg" },
           { val: checkpoints.length > 0 ? (formatEta(calcEtaMs(huidigKm, TOTAL_KM, snelheid)) || "—") : "ma ~14:24", sub: "finish", lbl: "ETA" },
-        ].map((s, i) => (
-          <div key={i} style={{ background: "#1a2530", borderRadius: 12, padding: "10px 8px", textAlign: "center" }}>
-            <div style={{ fontSize: i === 2 ? 12 : 15, fontWeight: 700, lineHeight: 1.2 }}>{s.val}</div>
-            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{s.sub}</div>
-            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{s.lbl}</div>
-          </div>
-        ))}
+        ].map(function(s, i) {
+          return (
+            <div key={i} style={{ background: "#1a2530", borderRadius: 12, padding: "10px 8px", textAlign: "center" }}>
+              <div style={{ fontSize: i === 2 ? 12 : 15, fontWeight: 700, lineHeight: 1.2 }}>{s.val}</div>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{s.sub}</div>
+              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{s.lbl}</div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Nu / Volgend */}
       <div style={{ padding: "10px 16px 0", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
         <div style={{ background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.2)", borderRadius: 12, padding: "12px 14px" }}>
-          <div style={{ fontSize: 10, color: "#4ade80", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 3 }}>📍 Nu bij</div>
+          <div style={{ fontSize: 10, color: "#4ade80", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 3 }}>Nu bij</div>
           <div style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.3 }}>{huidigPunt.naam}</div>
           <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>{huidigPunt.km} km</div>
         </div>
         {volgendWP && (
           <div style={{ background: "#1a2530", borderRadius: 12, padding: "12px 14px" }}>
-            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 3 }}>🎯 Volgend WP</div>
-            <div style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.3 }}>{volgendWP.naam.split("–").pop()?.trim()}</div>
+            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 3 }}>Volgend WP</div>
+            <div style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.3 }}>{volgendWP.naam.split("–").pop().trim()}</div>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>{checkpoints.length > 0 ? (formatEta(calcEtaMs(huidigKm, volgendWP.km, snelheid)) || volgendWP.tijd) : volgendWP.tijd}</div>
           </div>
         )}
       </div>
 
-      {/* Filter + zoek */}
+      <RouteKaart huidigKm={huidigKm} snelheid={snelheid} gpsData={gebruiktGPS ? gpsData : null} />
+
       <div style={{ padding: "14px 16px 0" }}>
         <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
-          {[["belangrijk","WP + CP"],["steden","Steden"],["rbr","RBR"],["alles","Alles"]].map(([k,l]) => (
-            <button key={k} onClick={() => setFilter(k)} style={{ padding: "5px 12px", borderRadius: 99, border: "none", fontSize: 12, fontWeight: 500, cursor: "pointer", background: filter === k ? "#4ade80" : "#1a2530", color: filter === k ? "#0a2e14" : "rgba(255,255,255,0.6)" }}>{l}</button>
-          ))}
+          {[["belangrijk","WP + CP"],["steden","Steden"],["rbr","RBR"],["alles","Alles"]].map(function(item) {
+            return (
+              <button key={item[0]} onClick={function() { setFilter(item[0]); }} style={{ padding: "5px 12px", borderRadius: 99, border: "none", fontSize: 12, fontWeight: 500, cursor: "pointer", background: filter === item[0] ? "#4ade80" : "#1a2530", color: filter === item[0] ? "#0a2e14" : "rgba(255,255,255,0.6)" }}>{item[1]}</button>
+            );
+          })}
         </div>
-        <input value={zoek} onChange={e => setZoek(e.target.value)} placeholder="Zoek plaats…" style={{ width: "100%", padding: "9px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "#1a2530", color: "white", fontSize: 14, outline: "none", fontFamily: "inherit", marginBottom: 10 }} />
+        <input value={zoek} onChange={function(e) { setZoek(e.target.value); }} placeholder="Zoek plaats…" style={{ width: "100%", padding: "9px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "#1a2530", color: "white", fontSize: 14, outline: "none", fontFamily: "inherit", marginBottom: 10 }} />
       </div>
 
-      {/* Route tijdlijn */}
       <div style={{ padding: "0 16px" }}>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>Route · {zichtbaar.length} punten</div>
         <div style={{ background: "#1a2530", borderRadius: 14, overflow: "hidden" }}>
-          {zichtbaar.map((p, i) => {
-            const s = STIJL[p.type];
+          {zichtbaar.map(function(p, i) {
+            const s = STIJL[p.type] || STIJL.door;
             const isWP = ["start","wp","finish"].includes(p.type);
             const gepasseerd = checkpoints.length > 0 && p.km <= huidigKm;
             const isNu = p.km === huidigPunt.km;
-            const werkelijk = checkpoints.find(c => c.naam === p.naam);
+            const werkelijk = checkpoints.find(function(c) { return c.naam === p.naam; });
             const eta = checkpoints.length > 0 && !gepasseerd ? formatEta(calcEtaMs(huidigKm, p.km, snelheid)) : null;
             return (
-              <div key={i} style={{ padding: isWP ? "13px 16px" : "8px 16px", borderBottom: i < zichtbaar.length-1 ? `1px solid rgba(255,255,255,${isWP?"0.08":"0.04"})` : "none", display: "flex", alignItems: "center", gap: 10, background: isNu ? "rgba(74,222,128,0.06)" : isWP ? "rgba(255,255,255,0.01)" : "transparent" }}>
-                <div style={{ width: isWP ? 28 : 18, height: isWP ? 28 : 18, borderRadius: "50%", flexShrink: 0, background: gepasseerd ? (isWP ? "#16a34a" : "rgba(74,222,128,0.15)") : "#1e3a2e", border: isNu ? `2px solid ${s.kleur}` : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: isWP ? 12 : 9 }}>
+              <div key={i} style={{ padding: isWP ? "13px 16px" : "8px 16px", borderBottom: i < zichtbaar.length-1 ? "1px solid rgba(255,255,255," + (isWP ? "0.08" : "0.04") + ")" : "none", display: "flex", alignItems: "center", gap: 10, background: isNu ? "rgba(74,222,128,0.06)" : isWP ? "rgba(255,255,255,0.01)" : "transparent" }}>
+                <div style={{ width: isWP ? 28 : 18, height: isWP ? 28 : 18, borderRadius: "50%", flexShrink: 0, background: gepasseerd ? (isWP ? "#16a34a" : "rgba(74,222,128,0.15)") : "#1e3a2e", border: isNu ? "2px solid " + s.kleur : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: isWP ? 12 : 9 }}>
                   {gepasseerd && isWP ? "✓" : s.icon}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: isWP ? 14 : 12, fontWeight: isWP ? 600 : 400, color: gepasseerd ? (isWP ? "#4ade80" : "rgba(74,222,128,0.6)") : isWP ? "white" : "rgba(255,255,255,0.5)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.naam}</div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.2)", marginTop: 1 }}>{p.km} km{p.team ? ` · ${p.team}` : ""}</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.2)", marginTop: 1 }}>{p.km} km{p.team ? " · " + p.team : ""}</div>
                 </div>
                 <div style={{ textAlign: "right", flexShrink: 0, minWidth: 56 }}>
                   {werkelijk ? (
                     <div style={{ fontSize: 12, fontWeight: 600, color: "#4ade80" }}>{new Date(werkelijk.timestamp).toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"})}</div>
                   ) : eta ? (
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", fontStyle: "italic" }}>~{eta}</div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", fontStyle: "italic" }}>{"~" + eta}</div>
                   ) : p.tijd ? (
                     <div style={{ fontSize: 11, color: "rgba(255,255,255,0.2)" }}>{p.tijd}</div>
                   ) : null}
@@ -553,22 +1585,21 @@ function SupporterTracker({ onSwitch }) {
         </div>
       </div>
 
-      {/* Legenda */}
       <div style={{ padding: "12px 16px 0" }}>
         <div style={{ background: "#1a2530", borderRadius: 12, padding: "10px 14px", display: "flex", flexWrap: "wrap", gap: "5px 12px" }}>
-          {Object.entries(STIJL).map(([k,v]) => (
-            <div key={k} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
-              <span>{v.icon}</span><span>{v.label}</span>
-            </div>
-          ))}
+          {Object.entries(STIJL).map(function(entry) {
+            return (
+              <div key={entry[0]} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
+                <span>{entry[1].icon}</span><span>{entry[1].label}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
 
       <div style={{ textAlign: "center", marginTop: 20 }}>
-        <button onClick={onSwitch} style={{ background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 99, padding: "8px 20px", fontSize: 13, color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>📱 Naar team-app</button>
+        <button onClick={onSwitch} style={{ background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 99, padding: "8px 20px", fontSize: 13, color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>Team app</button>
       </div>
-
-      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}`}</style>
     </div>
   );
 }
@@ -577,12 +1608,11 @@ function SupporterTracker({ onSwitch }) {
 function App() {
   const [view, setView] = useState("supporter");
   return view === "team"
-    ? <TeamApp onSwitch={() => setView("supporter")} />
-    : <SupporterTracker onSwitch={() => setView("team")} />;
+    ? <TeamApp onSwitch={function() { setView("supporter"); }} />
+    : <SupporterTracker onSwitch={function() { setView("team"); }} />;
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </script>
 </body>
 </html>
