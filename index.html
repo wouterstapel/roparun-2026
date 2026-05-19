@@ -1271,11 +1271,10 @@ function TeamLogPost({ scriptUrl }) {
   function post() {
     if (!bericht.trim()) return;
     setLoading(true);
-    fetch(scriptUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "team_log", bericht: bericht.trim(), timestamp: new Date().toISOString() })
-    }).then(function() {
+    const logUrl = scriptUrl + "?type=team_log&bericht=" + encodeURIComponent(bericht.trim()) + "&timestamp=" + encodeURIComponent(new Date().toISOString());
+    fetch(logUrl)
+      .then(function(r) { return r.json(); })
+      .then(function() {
         showToast("✓ Update geplaatst!");
         setBericht("");
         setLoading(false);
@@ -1481,11 +1480,10 @@ function SupportersBlog({ supporters, scriptUrl }) {
     if (bericht.length > 280) { setFout("Bericht max 280 tekens"); return; }
     setFout("");
     setLoading(true);
-    fetch(scriptUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "supporter", naam: naam.trim(), bericht: bericht.trim(), timestamp: new Date().toISOString() })
-    }).then(function() {
+    const supUrl = scriptUrl + "?type=supporter&naam=" + encodeURIComponent(naam.trim()) + "&bericht=" + encodeURIComponent(bericht.trim()) + "&timestamp=" + encodeURIComponent(new Date().toISOString());
+    fetch(supUrl)
+      .then(function(r) { return r.json(); })
+      .then(function() {
         showToast("✓ Bericht geplaatst!");
         setBericht("");
         setLoading(false);
