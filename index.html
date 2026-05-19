@@ -1260,6 +1260,53 @@ function RouteKaart({ huidigKm, snelheid, gpsData }) {
   );
 }
 
+// ── TEAM LOG POST ─────────────────────────────────────────────────────────────
+function TeamLogPost({ scriptUrl }) {
+  const [bericht, setBericht] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState("");
+
+  function showToast(msg) { setToast(msg); setTimeout(function() { setToast(""); }, 3000); }
+
+  function post() {
+    if (!bericht.trim()) return;
+    setLoading(true);
+    fetch(scriptUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "team_log", bericht: bericht.trim(), timestamp: new Date().toISOString() })
+    }).then(function() {
+        showToast("✓ Update geplaatst!");
+        setBericht("");
+        setLoading(false);
+      })
+      .catch(function() {
+        showToast("Mislukt — probeer opnieuw");
+        setLoading(false);
+      });
+  }
+
+  return (
+    <div>
+      <div style={{ position: "relative" }}>
+        <textarea
+          value={bericht}
+          onChange={function(e) { setBericht(e.target.value); }}
+          placeholder="Stuur een update naar je supporters…"
+          maxLength={280}
+          rows={3}
+          style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "#0f1923", color: "white", fontSize: 14, outline: "none", fontFamily: "inherit", resize: "none" }}
+        />
+        <span style={{ position: "absolute", bottom: 8, right: 10, fontSize: 10, color: bericht.length > 250 ? "#f87171" : "rgba(255,255,255,0.25)" }}>{bericht.length}/280</span>
+      </div>
+      <button onClick={post} disabled={loading || !bericht.trim()} style={{ width: "100%", marginTop: 8, padding: "12px", fontSize: 15, fontWeight: 700, borderRadius: 12, border: "none", background: !bericht.trim() ? "#1a2530" : loading ? "#1e3a2e" : "linear-gradient(135deg,#16a34a,#4ade80)", color: !bericht.trim() ? "rgba(255,255,255,0.3)" : "#000", cursor: !bericht.trim() ? "default" : "pointer", fontFamily: "inherit" }}>
+        {loading ? "Versturen…" : "📢 Post update"}
+      </button>
+      {toast && <div style={{ position: "fixed", bottom: 30, left: "50%", transform: "translateX(-50%)", background: "#16a34a", color: "white", padding: "12px 24px", borderRadius: 99, fontSize: 14, fontWeight: 600, zIndex: 100, whiteSpace: "nowrap" }}>{toast}</div>}
+    </div>
+  );
+}
+
 // ── PIN ───────────────────────────────────────────────────────────────────────
 function PinScherm({ onSuccess }) {
   const [pin, setPin] = useState("");
@@ -1403,6 +1450,12 @@ function TeamApp({ onSwitch }) {
             })}
           </div>
         )}
+        {/* Team logboek bericht posten */}
+        <div style={{ background: "#1a2530", borderRadius: 14, padding: "14px", marginBottom: 14 }}>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>📋 Post update naar supporters</div>
+          <TeamLogPost scriptUrl={SCRIPT_URL} huidigPunt={null} addLog={function(msg, t) {}} showToast={function(msg) {}} />
+        </div>
+
         <div style={{ textAlign: "center" }}>
           <button onClick={onSwitch} style={{ background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 99, padding: "8px 20px", fontSize: 13, color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>👀 Supporter-tracker</button>
         </div>
@@ -1412,10 +1465,101 @@ function TeamApp({ onSwitch }) {
   );
 }
 
+// ── SUPPORTERS BLOG ───────────────────────────────────────────────────────────
+function SupportersBlog({ supporters, scriptUrl }) {
+  const [naam, setNaam] = useState("");
+  const [bericht, setBericht] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState("");
+  const [fout, setFout] = useState("");
+
+  function showToast(msg) { setToast(msg); setTimeout(function() { setToast(""); }, 3000); }
+
+  function verstuur() {
+    if (!naam.trim()) { setFout("Vul je naam in"); return; }
+    if (!bericht.trim()) { setFout("Typ een bericht"); return; }
+    if (bericht.length > 280) { setFout("Bericht max 280 tekens"); return; }
+    setFout("");
+    setLoading(true);
+    fetch(scriptUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "supporter", naam: naam.trim(), bericht: bericht.trim(), timestamp: new Date().toISOString() })
+    }).then(function() {
+        showToast("✓ Bericht geplaatst!");
+        setBericht("");
+        setLoading(false);
+      })
+      .catch(function() {
+        setFout("Versturen mislukt — probeer opnieuw");
+        setLoading(false);
+      });
+  }
+
+  return (
+    <div style={{ padding: "14px 16px 0" }}>
+      <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>💙 Supporters</div>
+
+      {/* Invoer formulier */}
+      <div style={{ background: "#1a2530", borderRadius: 14, padding: "14px", marginBottom: 10 }}>
+        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 10 }}>Laat een bericht achter voor het team!</div>
+        <input
+          value={naam}
+          onChange={function(e) { setNaam(e.target.value); setFout(""); }}
+          placeholder="Jouw naam *"
+          maxLength={50}
+          style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: fout && !naam.trim() ? "1px solid #f87171" : "1px solid rgba(255,255,255,0.1)", background: "#0f1923", color: "white", fontSize: 14, outline: "none", fontFamily: "inherit", marginBottom: 8 }}
+        />
+        <div style={{ position: "relative" }}>
+          <textarea
+            value={bericht}
+            onChange={function(e) { setBericht(e.target.value); setFout(""); }}
+            placeholder="Typ je bericht... 💪🏃‍♂️🎉"
+            maxLength={280}
+            rows={3}
+            style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: fout && !bericht.trim() ? "1px solid #f87171" : "1px solid rgba(255,255,255,0.1)", background: "#0f1923", color: "white", fontSize: 14, outline: "none", fontFamily: "inherit", resize: "none" }}
+          />
+          <span style={{ position: "absolute", bottom: 8, right: 10, fontSize: 10, color: bericht.length > 250 ? "#f87171" : "rgba(255,255,255,0.25)" }}>{bericht.length}/280</span>
+        </div>
+        {fout && <div style={{ fontSize: 12, color: "#f87171", marginTop: 6 }}>{fout}</div>}
+        <button onClick={verstuur} disabled={loading} style={{ width: "100%", marginTop: 10, padding: "12px", fontSize: 15, fontWeight: 700, borderRadius: 12, border: "none", background: loading ? "#1e3a2e" : "linear-gradient(135deg,#1d4ed8,#3b82f6)", color: "white", cursor: loading ? "default" : "pointer", fontFamily: "inherit" }}>
+          {loading ? "Versturen…" : "💙 Stuur bericht"}
+        </button>
+      </div>
+
+      {/* Berichten lijst */}
+      {supporters.length === 0 ? (
+        <div style={{ background: "#1a2530", borderRadius: 14, padding: "16px", fontSize: 13, color: "rgba(255,255,255,0.3)", textAlign: "center" }}>Nog geen supporter berichten — wees de eerste!</div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {supporters.map(function(s, i) {
+            const d = new Date(s.timestamp);
+            const tijd = pad(d.getHours()) + ":" + pad(d.getMinutes());
+            const dag = ["zo","ma","di","wo","do","vr","za"][d.getDay()];
+            return (
+              <div key={i} style={{ background: "rgba(59,130,246,0.07)", border: "1px solid rgba(59,130,246,0.2)", borderRadius: 12, padding: "12px 14px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: "#60a5fa" }}>💙 {s.naam}</span>
+                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{dag} {tijd}</span>
+                </div>
+                <div style={{ fontSize: 14, color: "rgba(255,255,255,0.85)", lineHeight: 1.4 }}>{s.bericht}</div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {toast && <div style={{ position: "fixed", bottom: 30, left: "50%", transform: "translateX(-50%)", background: "#1d4ed8", color: "white", padding: "12px 24px", borderRadius: 99, fontSize: 14, fontWeight: 600, zIndex: 100, whiteSpace: "nowrap" }}>{toast}</div>}
+    </div>
+  );
+}
+
 // ── SUPPORTER TRACKER ─────────────────────────────────────────────────────────
 function SupporterTracker({ onSwitch }) {
   const [checkpoints, setCheckpoints] = useState([]);
   const [gpsData, setGpsData] = useState(null);
+  const [teamLog, setTeamLog] = useState([]);
+  const [supporters, setSupporters] = useState([]);
   const [lastUpdate, setLastUpdate] = useState(null);
   const [filter, setFilter] = useState("belangrijk");
   const [zoek, setZoek] = useState("");
@@ -1443,6 +1587,10 @@ function SupporterTracker({ onSwitch }) {
         } else {
           setGpsData(null);
         }
+        // Team logboek
+        if (data.team_log) setTeamLog(data.team_log);
+        // Supporters
+        if (data.supporters) setSupporters(data.supporters);
         setLastUpdate(new Date());
       }).catch(function() {});
   }
@@ -1620,6 +1768,34 @@ function SupporterTracker({ onSwitch }) {
           })}
         </div>
       </div>
+
+      {/* Team Logboek */}
+      <div style={{ padding: "14px 16px 0" }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>📋 Team logboek</div>
+        {teamLog.length === 0 ? (
+          <div style={{ background: "#1a2530", borderRadius: 14, padding: "16px", fontSize: 13, color: "rgba(255,255,255,0.3)", textAlign: "center" }}>Nog geen updates van het team</div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {teamLog.map(function(l, i) {
+              const d = new Date(l.timestamp);
+              const tijd = pad(d.getHours()) + ":" + pad(d.getMinutes());
+              const dag = ["zo","ma","di","wo","do","vr","za"][d.getDay()];
+              return (
+                <div key={i} style={{ background: "rgba(74,222,128,0.07)", border: "1px solid rgba(74,222,128,0.2)", borderRadius: 12, padding: "12px 14px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                    <span style={{ fontSize: 11, color: "#4ade80", fontWeight: 600 }}>🏃 HW-Runners</span>
+                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{dag} {tijd}{l.locatie ? " · " + l.locatie : ""}</span>
+                  </div>
+                  <div style={{ fontSize: 14, color: "white", lineHeight: 1.4 }}>{l.bericht}</div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Supporters blog */}
+      <SupportersBlog supporters={supporters} scriptUrl={SCRIPT_URL} />
 
       <div style={{ textAlign: "center", marginTop: 20 }}>
         <button onClick={onSwitch} style={{ background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 99, padding: "8px 20px", fontSize: 13, color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>Team app</button>
