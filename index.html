@@ -1338,7 +1338,12 @@ function TeamApp({ onSwitch }) {
   };
 
   const zichtbaar = ROUTE.filter(function(p) {
-    if (!toonTypes[filter] || !toonTypes[filter].includes(p.type)) return false;
+    if (filter === "doorkomsten") {
+      if (!["start","wp","finish","door"].includes(p.type)) return false;
+      if (p.type === "door" && !p.naam.toLowerCase().startsWith("doorkomst")) return false;
+    } else {
+      if (!toonTypes[filter] || !toonTypes[filter].includes(p.type)) return false;
+    }
     if (zoek && !p.naam.toLowerCase().includes(zoek.toLowerCase())) return false;
     return true;
   });
@@ -1474,11 +1479,17 @@ function SupporterTracker({ onSwitch }) {
     belangrijk: ["start","wp","finish","cp"],
     steden: ["start","wp","finish","door"],
     rbr: ["start","wp","finish","rbr"],
+    doorkomsten: ["start","wp","finish","door"],
     alles: ["start","wp","finish","cp","rbr","door","toilet"],
   };
 
   const zichtbaar = ROUTE.filter(function(p) {
-    if (!toonTypes[filter] || !toonTypes[filter].includes(p.type)) return false;
+    if (filter === "doorkomsten") {
+      if (!["start","wp","finish","door"].includes(p.type)) return false;
+      if (p.type === "door" && !p.naam.toLowerCase().startsWith("doorkomst")) return false;
+    } else {
+      if (!toonTypes[filter] || !toonTypes[filter].includes(p.type)) return false;
+    }
     if (zoek && !p.naam.toLowerCase().includes(zoek.toLowerCase())) return false;
     return true;
   });
@@ -1503,6 +1514,19 @@ function SupporterTracker({ onSwitch }) {
         </div>
         <div style={{ height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 3, overflow: "hidden" }}>
           <div style={{ height: "100%", width: pct + "%", background: "linear-gradient(90deg,#16a34a,#4ade80)", borderRadius: 3, transition: "width 0.8s" }} />
+        </div>
+
+        {/* GPS Status indicator */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, padding: "8px 12px", background: gpsStatus === "live" ? "rgba(74,222,128,0.15)" : gpsStatus === "vertraagd" ? "rgba(251,191,36,0.15)" : checkpointKm > 0 ? "rgba(59,130,246,0.15)" : "rgba(255,255,255,0.05)", borderRadius: 10, border: "1px solid " + (gpsStatus === "live" ? "rgba(74,222,128,0.4)" : gpsStatus === "vertraagd" ? "rgba(251,191,36,0.4)" : checkpointKm > 0 ? "rgba(59,130,246,0.4)" : "rgba(255,255,255,0.1)") }}>
+          <div style={{ width: 10, height: 10, borderRadius: "50%", flexShrink: 0, background: gpsStatus === "live" ? "#4ade80" : gpsStatus === "vertraagd" ? "#fbbf24" : checkpointKm > 0 ? "#3b82f6" : "#6b7280", animation: gpsStatus === "live" ? "pulse 2s infinite" : "none" }} />
+          <span style={{ fontSize: 12, fontWeight: 600, flex: 1, color: gpsStatus === "live" ? "#4ade80" : gpsStatus === "vertraagd" ? "#fbbf24" : checkpointKm > 0 ? "#3b82f6" : "rgba(255,255,255,0.4)" }}>
+            {gpsStatus === "live" ? "🛰️ GPS Live — Traccar actief" : gpsStatus === "vertraagd" ? "⚠️ GPS Vertraagd — laatste update > 10 min" : checkpointKm > 0 ? "📍 Checkpoint — geen GPS beschikbaar" : "⚪ Wachten op data…"}
+          </span>
+          {gpsData && gpsData.timestamp && (
+            <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", flexShrink: 0 }}>
+              {Math.round((Date.now() - new Date(gpsData.timestamp).getTime()) / 60000) < 1 ? "zojuist" : Math.round((Date.now() - new Date(gpsData.timestamp).getTime()) / 60000) + " min"}
+            </span>
+          )}
         </div>
       </div>
 
@@ -1542,7 +1566,7 @@ function SupporterTracker({ onSwitch }) {
 
       <div style={{ padding: "14px 16px 0" }}>
         <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
-          {[["belangrijk","WP + CP"],["steden","Steden"],["rbr","RBR"],["alles","Alles"]].map(function(item) {
+          {[["belangrijk","WP + CP"],["steden","Steden"],["rbr","RBR"],["doorkomsten","Doorkomsten"],["alles","Alles"]].map(function(item) {
             return (
               <button key={item[0]} onClick={function() { setFilter(item[0]); }} style={{ padding: "5px 12px", borderRadius: 99, border: "none", fontSize: 12, fontWeight: 500, cursor: "pointer", background: filter === item[0] ? "#4ade80" : "#1a2530", color: filter === item[0] ? "#0a2e14" : "rgba(255,255,255,0.6)" }}>{item[1]}</button>
             );
