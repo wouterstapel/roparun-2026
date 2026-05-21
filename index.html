@@ -28,6 +28,7 @@ const TEAM_PIN = "2026";
 const STARTMS = new Date("2026-05-23T13:10:00+02:00").getTime();
 const TOTAL_KM = 547.6;
 const DEFAULT_SPEED = 11.0;
+const HW_LOGO = "data:image/png;base64,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";
 
 const ROUTE = [
   { km: 0,     naam: "START – Circuit La Clef des Champs", type: "start", tijd: "za 13:10" },
@@ -228,267 +229,6 @@ const ROUTE = [
   { km: 545.5, naam: "CP14 Wilhelminaplein (Tijdregistratie)", type: "cp" },
   { km: 547.6, naam: "FINISH – Coolsingel Rotterdam", type: "finish", tijd: "ma ~14:24" },
 ];
-const ROUTE_COORDS = [
-  [49.7647, 3.2389],
-  [49.78, 3.25],
-  [49.8333, 3.2667],
-  [49.8583, 3.2833],
-  [49.875, 3.3],
-  [49.9, 3.3333],
-  [49.9167, 3.35],
-  [49.9333, 3.3833],
-  [49.95, 3.4],
-  [49.9667, 3.4167],
-  [49.9833, 3.4333],
-  [49.9917, 3.4417],
-  [50.01, 3.45],
-  [50.0019, 3.4561],
-  [50.02, 3.47],
-  [50.05, 3.5],
-  [50.1, 3.5333],
-  [50.1167, 3.55],
-  [50.15, 3.5667],
-  [50.1667, 3.5833],
-  [50.1833, 3.6],
-  [50.2167, 3.6167],
-  [50.2333, 3.6333],
-  [50.2667, 3.65],
-  [50.2833, 3.6667],
-  [50.3, 3.6833],
-  [50.3167, 3.7],
-  [50.3333, 3.7167],
-  [50.35, 3.5833],
-  [50.3361, 3.5572],
-  [50.35, 3.5667],
-  [50.3833, 3.5833],
-  [50.4167, 3.6167],
-  [50.4333, 3.5833],
-  [50.4667, 3.65],
-  [50.5, 3.7167],
-  [50.5333, 3.7667],
-  [50.5833, 3.85],
-  [50.6, 3.8833],
-  [50.6333, 3.9333],
-  [50.6833, 4.0167],
-  [50.7167, 4.0833],
-  [50.7481, 3.8731],
-  [50.7667, 3.9],
-  [50.7833, 3.9167],
-  [50.8, 3.9667],
-  [50.8167, 4.0167],
-  [50.8333, 4.05],
-  [50.85, 4.0833],
-  [50.8667, 4.0167],
-  [50.8833, 4.05],
-  [50.9167, 4.15],
-  [50.9333, 4.1833],
-  [50.95, 4.2167],
-  [50.9667, 4.2333],
-  [50.9833, 4.2167],
-  [51.0167, 4.2333],
-  [51.0333, 4.25],
-  [51.0667, 4.25],
-  [51.0833, 4.2833],
-  [51.1, 4.3167],
-  [51.1167, 4.3333],
-  [51.1333, 4.35],
-  [51.15, 4.3667],
-  [51.1667, 4.3833],
-  [51.1833, 4.4],
-  [51.2, 4.3833],
-  [51.2167, 4.4],
-  [51.2333, 4.4167],
-  [51.2194, 4.4025],
-  [51.2833, 4.45],
-  [51.3, 4.4833],
-  [51.3333, 4.5333],
-  [51.3667, 4.5833],
-  [51.3833, 4.6167],
-  [51.4, 4.6333],
-  [51.4333, 4.65],
-  [51.4667, 4.7],
-  [51.5, 4.8],
-  [51.5333, 4.8667],
-  [51.55, 4.9167],
-  [51.5667, 5.05],
-  [51.6, 4.9333],
-  [51.5833, 4.9],
-  [51.5667, 4.8667],
-  [51.55, 4.8333],
-  [51.5833, 4.7833],
-  [51.5667, 4.7167],
-  [51.5667, 4.65],
-  [51.5667, 4.6333],
-  [51.5833, 4.5667],
-  [51.5667, 4.5333],
-  [51.55, 4.5167],
-  [51.5333, 4.5],
-  [51.5167, 4.4833],
-  [51.5333, 4.4667],
-  [51.5, 4.4333],
-  [51.4667, 4.4167],
-  [51.4167, 4.35],
-  [51.4667, 4.35],
-  [51.4333, 4.3333],
-  [51.45, 4.2833],
-  [51.5, 4.2667],
-  [51.5833, 4.25],
-  [51.6167, 4.2667],
-  [51.6333, 4.3667],
-  [51.65, 4.3833],
-  [51.6667, 4.3833],
-  [51.6833, 4.4],
-  [51.7, 4.4],
-  [51.7261, 4.4161],
-  [51.7333, 4.4167],
-  [51.75, 4.3833],
-  [51.7667, 4.3667],
-  [51.7833, 4.35],
-  [51.8, 4.3667],
-  [51.8333, 4.5],
-  [51.85, 4.5333],
-  [51.8833, 4.5167],
-  [51.91, 4.4833],
-  [51.9167, 4.4833],
-  [51.9225, 4.4792],
-];
-const KAART_PUNTEN = [
-  { lat: 49.75900, lon: 3.22391, naam: "START – Circuit La Clef des Champs", type: "start" },
-  { lat: 49.74498, lon: 3.23219, naam: "Clastres", type: "door" },
-  { lat: 49.77510, lon: 3.28021, naam: "Essigny-le-Grand", type: "door" },
-  { lat: 49.79004, lon: 3.30918, naam: "Urvillers", type: "door" },
-  { lat: 49.80832, lon: 3.34186, naam: "Itancourt", type: "door" },
-  { lat: 49.82542, lon: 3.33356, naam: "Neuville-Saint-Amand", type: "door" },
-  { lat: 49.83027, lon: 3.35671, naam: "Mesnil-Saint-Laurent", type: "door" },
-  { lat: 49.85055, lon: 3.36454, naam: "Homblières", type: "door" },
-  { lat: 49.89932, lon: 3.36649, naam: "Essigny-le-Petit", type: "door" },
-  { lat: 49.92125, lon: 3.37166, naam: "Fontaine-Uterte", type: "door" },
-  { lat: 49.96447, lon: 3.35484, naam: "Montbrehain", type: "door" },
-  { lat: 49.97653, lon: 3.38227, naam: "Brancourt-le-Grand CP02", type: "cp" },
-  { lat: 49.98932, lon: 3.45110, naam: "Bohain-en-Vermandois", type: "door" },
-  { lat: 49.98923, lon: 3.45160, naam: "WP01 – Bohain-en-Vermandois", type: "wp" },
-  { lat: 50.01612, lon: 3.46960, naam: "Becquigny", type: "door" },
-  { lat: 50.03318, lon: 3.46404, naam: "Busigny", type: "door" },
-  { lat: 50.08978, lon: 3.44801, naam: "Bertry", type: "door" },
-  { lat: 50.10523, lon: 3.47024, naam: "Troisvilles", type: "door" },
-  { lat: 50.15214, lon: 3.46458, naam: "Viesly", type: "door" },
-  { lat: 50.16192, lon: 3.48621, naam: "Briastre", type: "door" },
-  { lat: 50.18666, lon: 3.49698, naam: "Solesmes", type: "door" },
-  { lat: 50.21303, lon: 3.52423, naam: "Vertain", type: "door" },
-  { lat: 50.22896, lon: 3.54706, naam: "Escarmain CP03", type: "cp" },
-  { lat: 50.25855, lon: 3.58839, naam: "Ruesnes", type: "door" },
-  { lat: 50.28211, lon: 3.56403, naam: "Sepmeries", type: "door" },
-  { lat: 50.29275, lon: 3.57753, naam: "Maresches", type: "door" },
-  { lat: 50.31219, lon: 3.57629, naam: "Préseau", type: "door" },
-  { lat: 50.33659, lon: 3.57586, naam: "Saultain", type: "door" },
-  { lat: 50.33004, lon: 3.60349, naam: "Curgies", type: "door" },
-  { lat: 50.34395, lon: 3.64452, naam: "WP02 – Curgies/Sebourg", type: "wp" },
-  { lat: 50.34412, lon: 3.64300, naam: "Sebourg", type: "door" },
-  { lat: 50.36476, lon: 3.64703, naam: "Rombies-et-Marchipont", type: "door" },
-  { lat: 50.39980, lon: 3.66617, naam: "Quiévrechain", type: "door" },
-  { lat: 50.40602, lon: 3.68280, naam: "Quievrain", type: "door" },
-  { lat: 50.43250, lon: 3.68445, naam: "Hensies", type: "door" },
-  { lat: 50.43566, lon: 3.68954, naam: "Hensies CP04", type: "cp" },
-  { lat: 50.50855, lon: 3.71694, naam: "Stambruges", type: "door" },
-  { lat: 50.54863, lon: 3.73524, naam: "Beloeil", type: "door" },
-  { lat: 50.58674, lon: 3.80987, naam: "Chièvres", type: "door" },
-  { lat: 50.60871, lon: 3.83970, naam: "Atre", type: "door" },
-  { lat: 50.65656, lon: 3.87695, naam: "Ghislenghien", type: "door" },
-  { lat: 50.67903, lon: 3.93152, naam: "Bassily", type: "door" },
-  { lat: 50.71645, lon: 3.94004, naam: "Bever", type: "door" },
-  { lat: 50.73581, lon: 3.92929, naam: "WP03 – Bever", type: "wp" },
-  { lat: 50.74342, lon: 3.92298, naam: "Viane", type: "door" },
-  { lat: 50.74381, lon: 3.92311, naam: "Viane CP05", type: "cp" },
-  { lat: 50.75111, lon: 3.91980, naam: "Moerbeke", type: "door" },
-  { lat: 50.77314, lon: 3.88601, naam: "Geraardsbergen", type: "door" },
-  { lat: 50.78576, lon: 3.91731, naam: "Onkerzele", type: "door" },
-  { lat: 50.79449, lon: 3.94671, naam: "Grimminge", type: "door" },
-  { lat: 50.80576, lon: 3.98394, naam: "Roost", type: "door" },
-  { lat: 50.83563, lon: 4.02619, naam: "Ninove", type: "door" },
-  { lat: 50.87063, lon: 4.01746, naam: "Denderhoutem", type: "door" },
-  { lat: 50.94096, lon: 4.04329, naam: "Aalst", type: "door" },
-  { lat: 50.94376, lon: 4.05645, naam: "Doorkomst Aalst", type: "door" },
-  { lat: 50.95167, lon: 4.09462, naam: "CP Steunpunt Moorsel", type: "door" },
-  { lat: 50.94957, lon: 4.09822, naam: "Moorsel", type: "door" },
-  { lat: 50.96178, lon: 4.15511, naam: "Nijverseel", type: "door" },
-  { lat: 50.97196, lon: 4.16861, naam: "Opwijk CP06", type: "cp" },
-  { lat: 50.99746, lon: 4.17682, naam: "Opstal", type: "door" },
-  { lat: 51.02156, lon: 4.11818, naam: "WP04 – Opstal", type: "wp" },
-  { lat: 51.02186, lon: 4.11221, naam: "Sint-Gillis-bij-Dendermonde", type: "door" },
-  { lat: 51.03087, lon: 4.09844, naam: "Dendermonde", type: "door" },
-  { lat: 51.06808, lon: 4.03880, naam: "Zele", type: "door" },
-  { lat: 51.08617, lon: 4.05773, naam: "Durmen", type: "door" },
-  { lat: 51.09997, lon: 4.13837, naam: "Hamme", type: "door" },
-  { lat: 51.11411, lon: 4.14425, naam: "Elversele", type: "door" },
-  { lat: 51.11406, lon: 4.16547, naam: "Tielrode", type: "door" },
-  { lat: 51.12477, lon: 4.21424, naam: "Temse", type: "door" },
-  { lat: 51.13185, lon: 4.27424, naam: "Hemelrijk", type: "door" },
-  { lat: 51.14687, lon: 4.29806, naam: "Bazel", type: "door" },
-  { lat: 51.17015, lon: 4.31216, naam: "Kruibeke", type: "door" },
-  { lat: 51.17554, lon: 4.31855, naam: "Kruibeke CP07", type: "cp" },
-  { lat: 51.20215, lon: 4.34134, naam: "Burcht", type: "door" },
-  { lat: 51.21893, lon: 4.39556, naam: "Antwerpen", type: "door" },
-  { lat: 51.25418, lon: 4.45663, naam: "WP05 – Antwerpen", type: "wp" },
-  { lat: 51.29598, lon: 4.49731, naam: "Brasschaat", type: "door" },
-  { lat: 51.32787, lon: 4.52233, naam: "Maria-ter-Heide", type: "door" },
-  { lat: 51.35338, lon: 4.54680, naam: "Gooreind", type: "door" },
-  { lat: 51.40114, lon: 4.60535, naam: "Wuustwezel", type: "door" },
-  { lat: 51.44494, lon: 4.64361, naam: "De Lent", type: "door" },
-  { lat: 51.46957, lon: 4.65855, naam: "Zundert", type: "door" },
-  { lat: 51.47356, lon: 4.67367, naam: "Zundert CP08", type: "cp" },
-  { lat: 51.51648, lon: 4.70234, naam: "Rijsbergen", type: "door" },
-  { lat: 51.50124, lon: 4.79912, naam: "Strijbeek", type: "door" },
-  { lat: 51.50539, lon: 4.86100, naam: "Chaam", type: "door" },
-  { lat: 51.54058, lon: 4.91752, naam: "WP06 – Chaam", type: "wp" },
-  { lat: 51.54227, lon: 4.94059, naam: "Gilze", type: "door" },
-  { lat: 51.57944, lon: 4.98174, naam: "Tilburg", type: "door" },
-  { lat: 51.61845, lon: 4.95142, naam: "Dongen CP09", type: "cp" },
-  { lat: 51.62479, lon: 4.94273, naam: "Dongen", type: "door" },
-  { lat: 51.59002, lon: 4.91814, naam: "Rijen", type: "door" },
-  { lat: 51.57322, lon: 4.88220, naam: "Molenschot", type: "door" },
-  { lat: 51.56673, lon: 4.82909, naam: "Bavel", type: "door" },
-  { lat: 51.57328, lon: 4.78203, naam: "Breda", type: "door" },
-  { lat: 51.57733, lon: 4.73734, naam: "Princenhage", type: "door" },
-  { lat: 51.56811, lon: 4.63531, naam: "Etten-Leur", type: "door" },
-  { lat: 51.54365, lon: 4.63084, naam: "WP07 – Sprundel", type: "wp" },
-  { lat: 51.53734, lon: 4.59737, naam: "Sprundel", type: "door" },
-  { lat: 51.54568, lon: 4.59192, naam: "Sint Willebrord", type: "door" },
-  { lat: 51.58206, lon: 4.58362, naam: "Hoeven CP10", type: "cp" },
-  { lat: 51.58199, lon: 4.58222, naam: "Hoeven", type: "door" },
-  { lat: 51.58912, lon: 4.52375, naam: "Oudenbosch", type: "door" },
-  { lat: 51.58733, lon: 4.45987, naam: "Oud Gastel", type: "door" },
-  { lat: 51.53112, lon: 4.46081, naam: "Roosendaal", type: "door" },
-  { lat: 51.48122, lon: 4.39762, naam: "Wouwse Plantage", type: "door" },
-  { lat: 51.43192, lon: 4.37668, naam: "Huijbergen", type: "door" },
-  { lat: 51.39668, lon: 4.32833, naam: "Ossendrecht", type: "door" },
-  { lat: 51.40095, lon: 4.33784, naam: "WP08 – Ossendrecht", type: "wp" },
-  { lat: 51.41465, lon: 4.33903, naam: "Hoogerheide", type: "door" },
-  { lat: 51.42314, lon: 4.33166, naam: "Hoogerheide CP11", type: "cp" },
-  { lat: 51.48356, lon: 4.28224, naam: "Bergen op Zoom", type: "door" },
-  { lat: 51.52893, lon: 4.26765, naam: "Halsteren", type: "door" },
-  { lat: 51.54875, lon: 4.27287, naam: "Lepelstraat", type: "door" },
-  { lat: 51.58077, lon: 4.31552, naam: "Steenbergen", type: "door" },
-  { lat: 51.63381, lon: 4.36700, naam: "Dinteloord CP12", type: "cp" },
-  { lat: 51.63615, lon: 4.37159, naam: "Dinteloord", type: "door" },
-  { lat: 51.64636, lon: 4.39245, naam: "Dintelmond", type: "door" },
-  { lat: 51.65546, lon: 4.40985, naam: "Heijningen", type: "door" },
-  { lat: 51.67731, lon: 4.43236, naam: "Helwijk", type: "door" },
-  { lat: 51.69492, lon: 4.44049, naam: "Willemstad", type: "door" },
-  { lat: 51.72604, lon: 4.42378, naam: "WP09 – Numansdorp", type: "wp" },
-  { lat: 51.72986, lon: 4.43818, naam: "Numansdorp", type: "door" },
-  { lat: 51.74516, lon: 4.44107, naam: "Middelsluis", type: "door" },
-  { lat: 51.76073, lon: 4.44427, naam: "Oudesluis", type: "door" },
-  { lat: 51.76835, lon: 4.44431, naam: "Klaaswaal", type: "door" },
-  { lat: 51.82654, lon: 4.41125, naam: "Oud-Beijerland", type: "door" },
-  { lat: 51.82474, lon: 4.48416, naam: "Heinenoord", type: "door" },
-  { lat: 51.84178, lon: 4.53641, naam: "Barendrecht CP13", type: "cp" },
-  { lat: 51.85686, lon: 4.53600, naam: "Barendrecht", type: "door" },
-  { lat: 51.87866, lon: 4.50854, naam: "Rotterdam", type: "door" },
-  { lat: 51.87959, lon: 4.50987, naam: "Lombardijen", type: "door" },
-  { lat: 51.90776, lon: 4.49070, naam: "Wilhelminaplein CP14", type: "cp" },
-  { lat: 51.92243, lon: 4.47897, naam: "FINISH – Coolsingel Rotterdam", type: "finish" },
-];
-
 const GPX_ROUTE = [
   [49.759,3.22391],
   [49.75047,3.23041],
@@ -1102,7 +842,266 @@ const GPX_ROUTE = [
   [51.92089,4.47977],
   [51.92243,4.47897],
 ];
-
+const ROUTE_COORDS = [
+  [49.7647, 3.2389],
+  [49.78, 3.25],
+  [49.8333, 3.2667],
+  [49.8583, 3.2833],
+  [49.875, 3.3],
+  [49.9, 3.3333],
+  [49.9167, 3.35],
+  [49.9333, 3.3833],
+  [49.95, 3.4],
+  [49.9667, 3.4167],
+  [49.9833, 3.4333],
+  [49.9917, 3.4417],
+  [50.01, 3.45],
+  [50.0019, 3.4561],
+  [50.02, 3.47],
+  [50.05, 3.5],
+  [50.1, 3.5333],
+  [50.1167, 3.55],
+  [50.15, 3.5667],
+  [50.1667, 3.5833],
+  [50.1833, 3.6],
+  [50.2167, 3.6167],
+  [50.2333, 3.6333],
+  [50.2667, 3.65],
+  [50.2833, 3.6667],
+  [50.3, 3.6833],
+  [50.3167, 3.7],
+  [50.3333, 3.7167],
+  [50.35, 3.5833],
+  [50.3361, 3.5572],
+  [50.35, 3.5667],
+  [50.3833, 3.5833],
+  [50.4167, 3.6167],
+  [50.4333, 3.5833],
+  [50.4667, 3.65],
+  [50.5, 3.7167],
+  [50.5333, 3.7667],
+  [50.5833, 3.85],
+  [50.6, 3.8833],
+  [50.6333, 3.9333],
+  [50.6833, 4.0167],
+  [50.7167, 4.0833],
+  [50.7481, 3.8731],
+  [50.7667, 3.9],
+  [50.7833, 3.9167],
+  [50.8, 3.9667],
+  [50.8167, 4.0167],
+  [50.8333, 4.05],
+  [50.85, 4.0833],
+  [50.8667, 4.0167],
+  [50.8833, 4.05],
+  [50.9167, 4.15],
+  [50.9333, 4.1833],
+  [50.95, 4.2167],
+  [50.9667, 4.2333],
+  [50.9833, 4.2167],
+  [51.0167, 4.2333],
+  [51.0333, 4.25],
+  [51.0667, 4.25],
+  [51.0833, 4.2833],
+  [51.1, 4.3167],
+  [51.1167, 4.3333],
+  [51.1333, 4.35],
+  [51.15, 4.3667],
+  [51.1667, 4.3833],
+  [51.1833, 4.4],
+  [51.2, 4.3833],
+  [51.2167, 4.4],
+  [51.2333, 4.4167],
+  [51.2194, 4.4025],
+  [51.2833, 4.45],
+  [51.3, 4.4833],
+  [51.3333, 4.5333],
+  [51.3667, 4.5833],
+  [51.3833, 4.6167],
+  [51.4, 4.6333],
+  [51.4333, 4.65],
+  [51.4667, 4.7],
+  [51.5, 4.8],
+  [51.5333, 4.8667],
+  [51.55, 4.9167],
+  [51.5667, 5.05],
+  [51.6, 4.9333],
+  [51.5833, 4.9],
+  [51.5667, 4.8667],
+  [51.55, 4.8333],
+  [51.5833, 4.7833],
+  [51.5667, 4.7167],
+  [51.5667, 4.65],
+  [51.5667, 4.6333],
+  [51.5833, 4.5667],
+  [51.5667, 4.5333],
+  [51.55, 4.5167],
+  [51.5333, 4.5],
+  [51.5167, 4.4833],
+  [51.5333, 4.4667],
+  [51.5, 4.4333],
+  [51.4667, 4.4167],
+  [51.4167, 4.35],
+  [51.4667, 4.35],
+  [51.4333, 4.3333],
+  [51.45, 4.2833],
+  [51.5, 4.2667],
+  [51.5833, 4.25],
+  [51.6167, 4.2667],
+  [51.6333, 4.3667],
+  [51.65, 4.3833],
+  [51.6667, 4.3833],
+  [51.6833, 4.4],
+  [51.7, 4.4],
+  [51.7261, 4.4161],
+  [51.7333, 4.4167],
+  [51.75, 4.3833],
+  [51.7667, 4.3667],
+  [51.7833, 4.35],
+  [51.8, 4.3667],
+  [51.8333, 4.5],
+  [51.85, 4.5333],
+  [51.8833, 4.5167],
+  [51.91, 4.4833],
+  [51.9167, 4.4833],
+  [51.9225, 4.4792],
+];
+const KAART_PUNTEN = [
+  { lat: 49.75900, lon: 3.22391, naam: "START – Circuit La Clef des Champs", type: "start" },
+  { lat: 49.74498, lon: 3.23219, naam: "Clastres", type: "door" },
+  { lat: 49.77510, lon: 3.28021, naam: "Essigny-le-Grand", type: "door" },
+  { lat: 49.79004, lon: 3.30918, naam: "Urvillers", type: "door" },
+  { lat: 49.80832, lon: 3.34186, naam: "Itancourt", type: "door" },
+  { lat: 49.82542, lon: 3.33356, naam: "Neuville-Saint-Amand", type: "door" },
+  { lat: 49.83027, lon: 3.35671, naam: "Mesnil-Saint-Laurent", type: "door" },
+  { lat: 49.85055, lon: 3.36454, naam: "Homblières", type: "door" },
+  { lat: 49.89932, lon: 3.36649, naam: "Essigny-le-Petit", type: "door" },
+  { lat: 49.92125, lon: 3.37166, naam: "Fontaine-Uterte", type: "door" },
+  { lat: 49.96447, lon: 3.35484, naam: "Montbrehain", type: "door" },
+  { lat: 49.97653, lon: 3.38227, naam: "Brancourt-le-Grand CP02", type: "cp" },
+  { lat: 49.98932, lon: 3.45110, naam: "Bohain-en-Vermandois", type: "door" },
+  { lat: 49.98923, lon: 3.45160, naam: "WP01 – Bohain-en-Vermandois", type: "wp" },
+  { lat: 50.01612, lon: 3.46960, naam: "Becquigny", type: "door" },
+  { lat: 50.03318, lon: 3.46404, naam: "Busigny", type: "door" },
+  { lat: 50.08978, lon: 3.44801, naam: "Bertry", type: "door" },
+  { lat: 50.10523, lon: 3.47024, naam: "Troisvilles", type: "door" },
+  { lat: 50.15214, lon: 3.46458, naam: "Viesly", type: "door" },
+  { lat: 50.16192, lon: 3.48621, naam: "Briastre", type: "door" },
+  { lat: 50.18666, lon: 3.49698, naam: "Solesmes", type: "door" },
+  { lat: 50.21303, lon: 3.52423, naam: "Vertain", type: "door" },
+  { lat: 50.22896, lon: 3.54706, naam: "Escarmain CP03", type: "cp" },
+  { lat: 50.25855, lon: 3.58839, naam: "Ruesnes", type: "door" },
+  { lat: 50.28211, lon: 3.56403, naam: "Sepmeries", type: "door" },
+  { lat: 50.29275, lon: 3.57753, naam: "Maresches", type: "door" },
+  { lat: 50.31219, lon: 3.57629, naam: "Préseau", type: "door" },
+  { lat: 50.33659, lon: 3.57586, naam: "Saultain", type: "door" },
+  { lat: 50.33004, lon: 3.60349, naam: "Curgies", type: "door" },
+  { lat: 50.34395, lon: 3.64452, naam: "WP02 – Curgies/Sebourg", type: "wp" },
+  { lat: 50.34412, lon: 3.64300, naam: "Sebourg", type: "door" },
+  { lat: 50.36476, lon: 3.64703, naam: "Rombies-et-Marchipont", type: "door" },
+  { lat: 50.39980, lon: 3.66617, naam: "Quiévrechain", type: "door" },
+  { lat: 50.40602, lon: 3.68280, naam: "Quievrain", type: "door" },
+  { lat: 50.43250, lon: 3.68445, naam: "Hensies", type: "door" },
+  { lat: 50.43566, lon: 3.68954, naam: "Hensies CP04", type: "cp" },
+  { lat: 50.50855, lon: 3.71694, naam: "Stambruges", type: "door" },
+  { lat: 50.54863, lon: 3.73524, naam: "Beloeil", type: "door" },
+  { lat: 50.58674, lon: 3.80987, naam: "Chièvres", type: "door" },
+  { lat: 50.60871, lon: 3.83970, naam: "Atre", type: "door" },
+  { lat: 50.65656, lon: 3.87695, naam: "Ghislenghien", type: "door" },
+  { lat: 50.67903, lon: 3.93152, naam: "Bassily", type: "door" },
+  { lat: 50.71645, lon: 3.94004, naam: "Bever", type: "door" },
+  { lat: 50.73581, lon: 3.92929, naam: "WP03 – Bever", type: "wp" },
+  { lat: 50.74342, lon: 3.92298, naam: "Viane", type: "door" },
+  { lat: 50.74381, lon: 3.92311, naam: "Viane CP05", type: "cp" },
+  { lat: 50.75111, lon: 3.91980, naam: "Moerbeke", type: "door" },
+  { lat: 50.77314, lon: 3.88601, naam: "Geraardsbergen", type: "door" },
+  { lat: 50.78576, lon: 3.91731, naam: "Onkerzele", type: "door" },
+  { lat: 50.79449, lon: 3.94671, naam: "Grimminge", type: "door" },
+  { lat: 50.80576, lon: 3.98394, naam: "Roost", type: "door" },
+  { lat: 50.83563, lon: 4.02619, naam: "Ninove", type: "door" },
+  { lat: 50.87063, lon: 4.01746, naam: "Denderhoutem", type: "door" },
+  { lat: 50.94096, lon: 4.04329, naam: "Aalst", type: "door" },
+  { lat: 50.94376, lon: 4.05645, naam: "Doorkomst Aalst", type: "door" },
+  { lat: 50.95167, lon: 4.09462, naam: "CP Steunpunt Moorsel", type: "door" },
+  { lat: 50.94957, lon: 4.09822, naam: "Moorsel", type: "door" },
+  { lat: 50.96178, lon: 4.15511, naam: "Nijverseel", type: "door" },
+  { lat: 50.97196, lon: 4.16861, naam: "Opwijk CP06", type: "cp" },
+  { lat: 50.99746, lon: 4.17682, naam: "Opstal", type: "door" },
+  { lat: 51.02156, lon: 4.11818, naam: "WP04 – Opstal", type: "wp" },
+  { lat: 51.02186, lon: 4.11221, naam: "Sint-Gillis-bij-Dendermonde", type: "door" },
+  { lat: 51.03087, lon: 4.09844, naam: "Dendermonde", type: "door" },
+  { lat: 51.06808, lon: 4.03880, naam: "Zele", type: "door" },
+  { lat: 51.08617, lon: 4.05773, naam: "Durmen", type: "door" },
+  { lat: 51.09997, lon: 4.13837, naam: "Hamme", type: "door" },
+  { lat: 51.11411, lon: 4.14425, naam: "Elversele", type: "door" },
+  { lat: 51.11406, lon: 4.16547, naam: "Tielrode", type: "door" },
+  { lat: 51.12477, lon: 4.21424, naam: "Temse", type: "door" },
+  { lat: 51.13185, lon: 4.27424, naam: "Hemelrijk", type: "door" },
+  { lat: 51.14687, lon: 4.29806, naam: "Bazel", type: "door" },
+  { lat: 51.17015, lon: 4.31216, naam: "Kruibeke", type: "door" },
+  { lat: 51.17554, lon: 4.31855, naam: "Kruibeke CP07", type: "cp" },
+  { lat: 51.20215, lon: 4.34134, naam: "Burcht", type: "door" },
+  { lat: 51.21893, lon: 4.39556, naam: "Antwerpen", type: "door" },
+  { lat: 51.25418, lon: 4.45663, naam: "WP05 – Antwerpen", type: "wp" },
+  { lat: 51.29598, lon: 4.49731, naam: "Brasschaat", type: "door" },
+  { lat: 51.32787, lon: 4.52233, naam: "Maria-ter-Heide", type: "door" },
+  { lat: 51.35338, lon: 4.54680, naam: "Gooreind", type: "door" },
+  { lat: 51.40114, lon: 4.60535, naam: "Wuustwezel", type: "door" },
+  { lat: 51.44494, lon: 4.64361, naam: "De Lent", type: "door" },
+  { lat: 51.46957, lon: 4.65855, naam: "Zundert", type: "door" },
+  { lat: 51.47356, lon: 4.67367, naam: "Zundert CP08", type: "cp" },
+  { lat: 51.51648, lon: 4.70234, naam: "Rijsbergen", type: "door" },
+  { lat: 51.50124, lon: 4.79912, naam: "Strijbeek", type: "door" },
+  { lat: 51.50539, lon: 4.86100, naam: "Chaam", type: "door" },
+  { lat: 51.54058, lon: 4.91752, naam: "WP06 – Chaam", type: "wp" },
+  { lat: 51.54227, lon: 4.94059, naam: "Gilze", type: "door" },
+  { lat: 51.57944, lon: 4.98174, naam: "Tilburg", type: "door" },
+  { lat: 51.61845, lon: 4.95142, naam: "Dongen CP09", type: "cp" },
+  { lat: 51.62479, lon: 4.94273, naam: "Dongen", type: "door" },
+  { lat: 51.59002, lon: 4.91814, naam: "Rijen", type: "door" },
+  { lat: 51.57322, lon: 4.88220, naam: "Molenschot", type: "door" },
+  { lat: 51.56673, lon: 4.82909, naam: "Bavel", type: "door" },
+  { lat: 51.57328, lon: 4.78203, naam: "Breda", type: "door" },
+  { lat: 51.57733, lon: 4.73734, naam: "Princenhage", type: "door" },
+  { lat: 51.56811, lon: 4.63531, naam: "Etten-Leur", type: "door" },
+  { lat: 51.54365, lon: 4.63084, naam: "WP07 – Sprundel", type: "wp" },
+  { lat: 51.53734, lon: 4.59737, naam: "Sprundel", type: "door" },
+  { lat: 51.54568, lon: 4.59192, naam: "Sint Willebrord", type: "door" },
+  { lat: 51.58206, lon: 4.58362, naam: "Hoeven CP10", type: "cp" },
+  { lat: 51.58199, lon: 4.58222, naam: "Hoeven", type: "door" },
+  { lat: 51.58912, lon: 4.52375, naam: "Oudenbosch", type: "door" },
+  { lat: 51.58733, lon: 4.45987, naam: "Oud Gastel", type: "door" },
+  { lat: 51.53112, lon: 4.46081, naam: "Roosendaal", type: "door" },
+  { lat: 51.48122, lon: 4.39762, naam: "Wouwse Plantage", type: "door" },
+  { lat: 51.43192, lon: 4.37668, naam: "Huijbergen", type: "door" },
+  { lat: 51.39668, lon: 4.32833, naam: "Ossendrecht", type: "door" },
+  { lat: 51.40095, lon: 4.33784, naam: "WP08 – Ossendrecht", type: "wp" },
+  { lat: 51.41465, lon: 4.33903, naam: "Hoogerheide", type: "door" },
+  { lat: 51.42314, lon: 4.33166, naam: "Hoogerheide CP11", type: "cp" },
+  { lat: 51.48356, lon: 4.28224, naam: "Bergen op Zoom", type: "door" },
+  { lat: 51.52893, lon: 4.26765, naam: "Halsteren", type: "door" },
+  { lat: 51.54875, lon: 4.27287, naam: "Lepelstraat", type: "door" },
+  { lat: 51.58077, lon: 4.31552, naam: "Steenbergen", type: "door" },
+  { lat: 51.63381, lon: 4.36700, naam: "Dinteloord CP12", type: "cp" },
+  { lat: 51.63615, lon: 4.37159, naam: "Dinteloord", type: "door" },
+  { lat: 51.64636, lon: 4.39245, naam: "Dintelmond", type: "door" },
+  { lat: 51.65546, lon: 4.40985, naam: "Heijningen", type: "door" },
+  { lat: 51.67731, lon: 4.43236, naam: "Helwijk", type: "door" },
+  { lat: 51.69492, lon: 4.44049, naam: "Willemstad", type: "door" },
+  { lat: 51.72604, lon: 4.42378, naam: "WP09 – Numansdorp", type: "wp" },
+  { lat: 51.72986, lon: 4.43818, naam: "Numansdorp", type: "door" },
+  { lat: 51.74516, lon: 4.44107, naam: "Middelsluis", type: "door" },
+  { lat: 51.76073, lon: 4.44427, naam: "Oudesluis", type: "door" },
+  { lat: 51.76835, lon: 4.44431, naam: "Klaaswaal", type: "door" },
+  { lat: 51.82654, lon: 4.41125, naam: "Oud-Beijerland", type: "door" },
+  { lat: 51.82474, lon: 4.48416, naam: "Heinenoord", type: "door" },
+  { lat: 51.84178, lon: 4.53641, naam: "Barendrecht CP13", type: "cp" },
+  { lat: 51.85686, lon: 4.53600, naam: "Barendrecht", type: "door" },
+  { lat: 51.87866, lon: 4.50854, naam: "Rotterdam", type: "door" },
+  { lat: 51.87959, lon: 4.50987, naam: "Lombardijen", type: "door" },
+  { lat: 51.90776, lon: 4.49070, naam: "Wilhelminaplein CP14", type: "cp" },
+  { lat: 51.92243, lon: 4.47897, naam: "FINISH – Coolsingel Rotterdam", type: "finish" },
+];
 
 const WISSELPUNTEN = ROUTE.filter(function(p) { return ["start","wp","finish"].includes(p.type); });
 
@@ -1146,16 +1145,11 @@ function RouteKaart({ huidigKm, snelheid, gpsData }) {
   const animKmRef = useRef(0);
   const animTimerRef = useRef(null);
 
-  // Initialiseer kaart
   useEffect(function() {
     if (kaartRef.current || !mapRef.current) return;
     const map = L.map(mapRef.current, { zoomControl: true }).setView([50.5, 4.0], 6);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap" }).addTo(map);
-
-    // Blauwe route lijn via exacte GPX route
     L.polyline(GPX_ROUTE, { color: "#3b82f6", weight: 3, opacity: 0.7 }).addTo(map);
-
-    // Markers voor wisselpunten en checkpoints
     KAART_PUNTEN.forEach(function(p) {
       const kleuren = { start: "#f59e0b", wp: "#4ade80", finish: "#3b82f6", cp: "#fde047", door: "#93c5fd" };
       const kleur = kleuren[p.type] || "#94a3b8";
@@ -1164,27 +1158,22 @@ function RouteKaart({ huidigKm, snelheid, gpsData }) {
       const s = groot ? 14 : med ? 10 : 6;
       const icon = L.divIcon({
         className: "",
-        html: '<div style="width:' + s + 'px;height:' + s + 'px;background:' + kleur + ';border-radius:50%;border:2px solid rgba(255,255,255,0.8);box-shadow:0 1px 4px rgba(0,0,0,0.5)"></div>',
+        html: "<div style='width:" + s + "px;height:" + s + "px;background:" + kleur + ";border-radius:50%;border:2px solid rgba(255,255,255,0.8);box-shadow:0 1px 4px rgba(0,0,0,0.5)'></div>",
         iconSize: [s, s], iconAnchor: [s/2, s/2]
       });
       L.marker([p.lat, p.lon], { icon: icon }).addTo(map).bindPopup("<b>" + p.naam + "</b>");
     });
-
     kaartRef.current = map;
   }, []);
 
-  // Interpoleer lat/lon op basis van km positie
   function kmNaarCoord(km) {
     const idx = Math.min(Math.round((km / TOTAL_KM) * GPX_ROUTE.length), GPX_ROUTE.length - 1);
     return GPX_ROUTE[Math.max(0, idx)];
   }
 
-  // Update groene lijn en marker
   function updateKaart(km) {
     if (!kaartRef.current) return;
     const map = kaartRef.current;
-
-    // Groene lijn over gereden deel
     if (gereenRef.current) { map.removeLayer(gereenRef.current); gereenRef.current = null; }
     if (km > 0) {
       const n = Math.min(Math.round((km / TOTAL_KM) * GPX_ROUTE.length) + 1, GPX_ROUTE.length);
@@ -1193,46 +1182,33 @@ function RouteKaart({ huidigKm, snelheid, gpsData }) {
         gereenRef.current = L.polyline(gereden, { color: "#4ade80", weight: 4, opacity: 0.9 }).addTo(map);
       }
     }
-
-    // Oranje live marker - gebruik exacte GPS als beschikbaar
     if (markerRef.current) { map.removeLayer(markerRef.current); markerRef.current = null; }
     if (km > 0) {
-      const pos = (gpsData && gpsData.lat && gpsData.lon)
-        ? [parseFloat(gpsData.lat), parseFloat(gpsData.lon)]
-        : kmNaarCoord(km);
+      const isExactGPS = gpsData && gpsData.lat;
+      const pos = isExactGPS ? [parseFloat(gpsData.lat), parseFloat(gpsData.lon)] : kmNaarCoord(km);
       if (pos) {
-        const isExactGPS = gpsData && gpsData.lat;
         const icon = L.divIcon({
           className: "",
-          html: '<div style="width:18px;height:18px;background:' + (isExactGPS ? '#e65100' : '#f59e0b') + ';border-radius:50%;border:3px solid white;box-shadow:0 0 0 5px rgba(230,81,0,0.35)"></div>',
+          html: "<div style='width:18px;height:18px;background:" + (isExactGPS ? "#e65100" : "#f59e0b") + ";border-radius:50%;border:3px solid white;box-shadow:0 0 0 5px rgba(230,81,0,0.35)'></div>",
           iconSize: [18, 18], iconAnchor: [9, 9]
         });
-        markerRef.current = L.marker(pos, { icon: icon }).addTo(map)
-          .bindPopup("<b>" + (isExactGPS ? "🛰️ GPS positie" : "📍 Geschatte positie") + " · " + km.toFixed(1) + " km</b>");
+        markerRef.current = L.marker(pos, { icon: icon }).addTo(map).bindPopup("<b>" + (isExactGPS ? "GPS positie" : "Geschatte positie") + " · " + km.toFixed(1) + " km</b>");
       }
     }
   }
 
-  // Start animatie: marker loopt automatisch mee op basis van snelheid
   useEffect(function() {
     if (animTimerRef.current) { clearInterval(animTimerRef.current); animTimerRef.current = null; }
     if (huidigKm <= 0) return;
-
-    // Reset naar laatste bekende checkpoint
     animKmRef.current = huidigKm;
     updateKaart(huidigKm);
-
-    // Centreer kaart op huidige positie
     const pos = kmNaarCoord(huidigKm);
     if (pos && kaartRef.current) kaartRef.current.setView(pos, 12);
-
-    // Beweeg elke 10 sec vooruit (snelheid km/h → km per 10 sec)
     const stapKm = (snelheid || 11) / 360;
     animTimerRef.current = setInterval(function() {
       animKmRef.current = Math.min(animKmRef.current + stapKm, TOTAL_KM);
       updateKaart(animKmRef.current);
     }, 10000);
-
     return function() { if (animTimerRef.current) clearInterval(animTimerRef.current); };
   }, [huidigKm, snelheid, gpsData]);
 
@@ -1241,18 +1217,8 @@ function RouteKaart({ huidigKm, snelheid, gpsData }) {
       <div style={{ background: "#1a2530", padding: "8px 14px", fontSize: 11, color: "rgba(255,255,255,0.5)", display: "flex", gap: 12, alignItems: "center" }}>
         <span>Route kaart · exacte GPX route</span>
         <span style={{ marginLeft: "auto", display: "flex", gap: 10, alignItems: "center" }}>
-          <span style={{ display: "flex", gap: 4, alignItems: "center" }}>
-            <span style={{ width: 12, height: 3, background: "#3b82f6", display: "inline-block", borderRadius: 2 }}></span>
-            <span>Route</span>
-          </span>
-          <span style={{ display: "flex", gap: 4, alignItems: "center" }}>
-            <span style={{ width: 12, height: 3, background: "#4ade80", display: "inline-block", borderRadius: 2 }}></span>
-            <span>Gereden</span>
-          </span>
-          <span style={{ display: "flex", gap: 4, alignItems: "center" }}>
-            <span style={{ width: 12, height: 12, background: "#e65100", display: "inline-block", borderRadius: "50%" }}></span>
-            <span>Nu</span>
-          </span>
+          <span style={{ display: "flex", gap: 4, alignItems: "center" }}><span style={{ width: 12, height: 3, background: "#3b82f6", display: "inline-block", borderRadius: 2 }}></span><span>Route</span></span>
+          <span style={{ display: "flex", gap: 4, alignItems: "center" }}><span style={{ width: 12, height: 3, background: "#4ade80", display: "inline-block", borderRadius: 2 }}></span><span>Gereden</span></span>
         </span>
       </div>
       <div ref={mapRef} style={{ height: 300, width: "100%" }} />
@@ -1260,53 +1226,7 @@ function RouteKaart({ huidigKm, snelheid, gpsData }) {
   );
 }
 
-// ── TEAM LOG POST ─────────────────────────────────────────────────────────────
-function TeamLogPost({ scriptUrl }) {
-  const [bericht, setBericht] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState("");
-
-  function showToast(msg) { setToast(msg); setTimeout(function() { setToast(""); }, 3000); }
-
-  function post() {
-    if (!bericht.trim()) return;
-    setLoading(true);
-    const logUrl = scriptUrl + "?type=team_log&bericht=" + encodeURIComponent(bericht.trim()) + "&timestamp=" + encodeURIComponent(new Date().toISOString());
-    fetch(logUrl)
-      .then(function(r) { return r.json(); })
-      .then(function() {
-        showToast("✓ Update geplaatst!");
-        setBericht("");
-        setLoading(false);
-      })
-      .catch(function() {
-        showToast("Mislukt — probeer opnieuw");
-        setLoading(false);
-      });
-  }
-
-  return (
-    <div>
-      <div style={{ position: "relative" }}>
-        <textarea
-          value={bericht}
-          onChange={function(e) { setBericht(e.target.value); }}
-          placeholder="Stuur een update naar je supporters…"
-          maxLength={280}
-          rows={3}
-          style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "#0f1923", color: "white", fontSize: 14, outline: "none", fontFamily: "inherit", resize: "none" }}
-        />
-        <span style={{ position: "absolute", bottom: 8, right: 10, fontSize: 10, color: bericht.length > 250 ? "#f87171" : "rgba(255,255,255,0.25)" }}>{bericht.length}/280</span>
-      </div>
-      <button onClick={post} disabled={loading || !bericht.trim()} style={{ width: "100%", marginTop: 8, padding: "12px", fontSize: 15, fontWeight: 700, borderRadius: 12, border: "none", background: !bericht.trim() ? "#1a2530" : loading ? "#1e3a2e" : "linear-gradient(135deg,#16a34a,#4ade80)", color: !bericht.trim() ? "rgba(255,255,255,0.3)" : "#000", cursor: !bericht.trim() ? "default" : "pointer", fontFamily: "inherit" }}>
-        {loading ? "Versturen…" : "📢 Post update"}
-      </button>
-      {toast && <div style={{ position: "fixed", bottom: 30, left: "50%", transform: "translateX(-50%)", background: "#16a34a", color: "white", padding: "12px 24px", borderRadius: 99, fontSize: 14, fontWeight: 600, zIndex: 100, whiteSpace: "nowrap" }}>{toast}</div>}
-    </div>
-  );
-}
-
-// ── PIN ───────────────────────────────────────────────────────────────────────
+// ── PIN SCHERM ────────────────────────────────────────────────────────────────
 function PinScherm({ onSuccess }) {
   const [pin, setPin] = useState("");
   const [fout, setFout] = useState(false);
@@ -1354,10 +1274,31 @@ function TeamApp({ onSwitch }) {
   const [toast, setToast] = useState("");
   const [filter, setFilter] = useState("wp");
   const [zoek, setZoek] = useState("");
-  const [tracking, setTracking] = useState(null);
+  const [tracking, setTracking] = useState("UIT");
   const [trackingLoading, setTrackingLoading] = useState(false);
+  const [liveData, setLiveData] = useState(null);
+  const [nu, setNu] = useState(Date.now());
 
-  if (!ingelogd) return <PinScherm onSuccess={function() { setIngelogd(true); }} />;
+  // Klok - elke seconde
+  useEffect(function() {
+    const t = setInterval(function() { setNu(Date.now()); }, 1000);
+    return function() { clearInterval(t); };
+  }, []);
+
+  // Live data ophalen
+  useEffect(function() {
+    function fetchLive() {
+      fetch(SCRIPT_URL + "?type=checkpoints")
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          setLiveData(data);
+          if (data.tracking) setTracking(data.tracking);
+        }).catch(function() {});
+    }
+    fetchLive();
+    const t = setInterval(fetchLive, 30000);
+    return function() { clearInterval(t); };
+  }, []);
 
   function nowStr() { return new Date().toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit", second: "2-digit" }); }
   function addLog(msg, t) { setLog(function(p) { return [{ msg: msg, t: t, time: nowStr() }, ...p].slice(0, 10); }); }
@@ -1372,10 +1313,7 @@ function TeamApp({ onSwitch }) {
         showToast(aan ? "✓ GPS tracking gestart!" : "⏹ GPS tracking gestopt");
         setTrackingLoading(false);
       })
-      .catch(function() {
-        showToast("Mislukt — probeer opnieuw");
-        setTrackingLoading(false);
-      });
+      .catch(function() { showToast("Mislukt — probeer opnieuw"); setTrackingLoading(false); });
   }
 
   function bevestig() {
@@ -1384,13 +1322,53 @@ function TeamApp({ onSwitch }) {
     const url = SCRIPT_URL + "?type=checkpoint&team=HW-Runners&checkpoint=" + encodeURIComponent(sel.naam) + "&km=" + sel.km + "&timestamp=" + encodeURIComponent(new Date().toISOString());
     fetch(url)
       .then(function(r) { return r.json(); })
-      .then(function(data) {
-        addLog("✓ " + sel.naam + " (" + sel.km + " km)", "ok");
-        showToast("✓ Gelogd!");
-        setLoading(false);
-        setSel(null);
-      })
+      .then(function() { addLog("✓ " + sel.naam + " (" + sel.km + " km)", "ok"); showToast("✓ Gelogd!"); setLoading(false); setSel(null); })
       .catch(function() { addLog("Versturen mislukt", "err"); setLoading(false); });
+  }
+
+  // Bereken afteller rustend team
+  const rustInfo = (function() {
+    const leeg = { volgendWP: WISSELPUNTEN[1], etaMs: null, restMs: null, snelheid: DEFAULT_SPEED, lopendTeam: "A" };
+    if (!liveData || !liveData.checkpoints || liveData.checkpoints.length <= 1) return leeg;
+    const cps = liveData.checkpoints.slice(1)
+      .map(function(r) { return { timestamp: r[0], naam: r[2], km: parseFloat(r[3]) || 0 }; })
+      .sort(function(a,b) { return a.km - b.km; });
+    if (cps.length === 0) return leeg;
+
+    const huidigKm = Math.max.apply(null, cps.map(function(c) { return c.km; }));
+    const gpsKm = (liveData.gps && liveData.gps.km) ? parseFloat(liveData.gps.km) : 0;
+    const effectiefKm = Math.max(huidigKm, gpsKm);
+
+    // Bepaal lopend team op basis van laatste wisselpunt
+    const laatste = cps[cps.length-1];
+    const huidigWP = WISSELPUNTEN.reduce(function(best, wp) {
+      return Math.abs(wp.km - laatste.km) < Math.abs(best.km - laatste.km) ? wp : best;
+    }, WISSELPUNTEN[0]);
+    const lopendTeam = (huidigWP && huidigWP.team && huidigWP.team.includes("A→B")) ? "B" : "A";
+
+    // Volgend wisselpunt
+    const volgendWP = WISSELPUNTEN.find(function(p) { return p.km > effectiefKm; });
+    if (!volgendWP) return leeg;
+
+    // Realtime snelheid huidige shift
+    const shiftStart = cps[cps.length-1];
+    const dKm = effectiefKm - shiftStart.km;
+    const dtMs = nu - new Date(shiftStart.timestamp).getTime();
+    const snelheid = (dKm > 0.3 && dtMs > 60000) ? dKm / (dtMs / 3600000) : DEFAULT_SPEED;
+
+    const restKm = volgendWP.km - effectiefKm;
+    const restMs = snelheid > 0 ? (restKm / snelheid) * 3600000 : null;
+    const etaMs = restMs ? nu + restMs : null;
+
+    return { volgendWP: volgendWP, etaMs: etaMs, restMs: restMs, snelheid: snelheid, lopendTeam: lopendTeam };
+  })();
+
+  function formatAfteller(ms) {
+    if (!ms || ms <= 0) return "00:00:00";
+    const h = Math.floor(ms / 3600000);
+    const m = Math.floor((ms % 3600000) / 60000);
+    const s = Math.floor((ms % 60000) / 1000);
+    return pad(h) + ":" + pad(m) + ":" + pad(s);
   }
 
   const toonTypes = {
@@ -1401,20 +1379,19 @@ function TeamApp({ onSwitch }) {
   };
 
   const zichtbaar = ROUTE.filter(function(p) {
-    if (filter === "doorkomsten") {
-      if (!["start","wp","finish","door"].includes(p.type)) return false;
-      if (p.type === "door" && !p.naam.toLowerCase().startsWith("doorkomst")) return false;
-    } else {
-      if (!toonTypes[filter] || !toonTypes[filter].includes(p.type)) return false;
-    }
+    if (!toonTypes[filter] || !toonTypes[filter].includes(p.type)) return false;
     if (zoek && !p.naam.toLowerCase().includes(zoek.toLowerCase())) return false;
     return true;
   });
 
+  if (!ingelogd) return <PinScherm onSuccess={function() { setIngelogd(true); }} />;
+
   return (
     <div style={{ fontFamily: "-apple-system,sans-serif", background: "#0f1923", minHeight: "100vh", color: "white", maxWidth: 430, margin: "0 auto", paddingBottom: 40 }}>
+
+      {/* Header */}
       <div style={{ background: "linear-gradient(135deg,#1a3a2a,#0f2a1a)", padding: "44px 20px 16px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
           <div>
             <div style={{ fontSize: 11, color: "#4ade80", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 4 }}>HW-Runners · Roparun 2026</div>
             <div style={{ fontSize: 22, fontWeight: 700 }}>Team App</div>
@@ -1422,16 +1399,16 @@ function TeamApp({ onSwitch }) {
           </div>
           <button onClick={function() { setIngelogd(false); }} style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 99, padding: "6px 12px", color: "rgba(255,255,255,0.4)", fontSize: 12, cursor: "pointer" }}>🔒 Slot</button>
         </div>
-        
-        {/* GPS Tracking aan/uit */}
-        <div style={{ marginTop: 14, padding: "12px 14px", background: tracking === "AAN" ? "rgba(74,222,128,0.1)" : "rgba(255,255,255,0.05)", borderRadius: 12, border: "1px solid " + (tracking === "AAN" ? "rgba(74,222,128,0.3)" : "rgba(255,255,255,0.1)"), display: "flex", alignItems: "center", gap: 12 }}>
+
+        {/* GPS Tracking toggle */}
+        <div style={{ padding: "12px 14px", background: tracking === "AAN" ? "rgba(74,222,128,0.1)" : "rgba(255,255,255,0.05)", borderRadius: 12, border: "1px solid " + (tracking === "AAN" ? "rgba(74,222,128,0.3)" : "rgba(255,255,255,0.1)"), display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ width: 10, height: 10, borderRadius: "50%", background: tracking === "AAN" ? "#4ade80" : "#6b7280", flexShrink: 0, animation: tracking === "AAN" ? "pulse 2s infinite" : "none" }} />
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: tracking === "AAN" ? "#4ade80" : "rgba(255,255,255,0.5)" }}>
               {tracking === "AAN" ? "🛰️ GPS Tracking actief" : "⏸ GPS Tracking gestopt"}
             </div>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginTop: 2 }}>
-              {tracking === "AAN" ? "Elke 5 min wordt GPS opgehaald van Traccar" : "Traccar GPS wordt niet opgehaald"}
+              {tracking === "AAN" ? "Elke 5 min GPS van Traccar" : "Traccar GPS wordt niet opgehaald"}
             </div>
           </div>
           {tracking !== "AAN" ? (
@@ -1447,14 +1424,20 @@ function TeamApp({ onSwitch }) {
       </div>
 
       <div style={{ padding: "14px 16px 0" }}>
+
+        {/* Filter tabs */}
         <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
-          {[["wp","Wisselpunten"],["cp","+ Checkpoints"],["rbr","+ RBR"],["alles","Alles"]].map(function(item) {
+          {[["alles","Alles"],["wp","Wisselpunten"],["cp","+ Checkpoints"],["rbr","+ RBR"]].map(function(item) {
             return (
               <button key={item[0]} onClick={function() { setFilter(item[0]); }} style={{ padding: "5px 12px", borderRadius: 99, border: "none", fontSize: 12, fontWeight: 500, cursor: "pointer", background: filter === item[0] ? "#4ade80" : "#1a2530", color: filter === item[0] ? "#0a2e14" : "rgba(255,255,255,0.6)" }}>{item[1]}</button>
             );
           })}
         </div>
+
+        {/* Zoek */}
         <input value={zoek} onChange={function(e) { setZoek(e.target.value); }} placeholder="Zoek plaats of punt…" style={{ width: "100%", padding: "9px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "#1a2530", color: "white", fontSize: 14, outline: "none", fontFamily: "inherit", marginBottom: 10 }} />
+
+        {/* Route lijst */}
         <div style={{ background: "#1a2530", borderRadius: 14, overflow: "hidden", marginBottom: 14, maxHeight: 380, overflowY: "auto" }}>
           {zichtbaar.map(function(p, i) {
             const s = STIJL[p.type] || STIJL.door;
@@ -1472,9 +1455,13 @@ function TeamApp({ onSwitch }) {
             );
           })}
         </div>
+
+        {/* Bevestig */}
         <button onClick={bevestig} disabled={loading || !sel} style={{ width: "100%", padding: 16, fontSize: 16, fontWeight: 700, borderRadius: 14, border: "none", background: !sel ? "#1a2530" : loading ? "#1a3a2a" : "linear-gradient(135deg,#16a34a,#4ade80)", color: !sel ? "rgba(255,255,255,0.3)" : "#000", cursor: !sel ? "default" : "pointer", marginBottom: 14 }}>
           {loading ? "Versturen…" : sel ? "✓ Bevestig: " + sel.naam : "Selecteer een punt hierboven"}
         </button>
+
+        {/* Log */}
         {log.length > 0 && (
           <div style={{ background: "#1a2530", borderRadius: 14, overflow: "hidden", marginBottom: 14 }}>
             <div style={{ padding: "8px 16px 4px", fontSize: 10, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Log</div>
@@ -1488,10 +1475,53 @@ function TeamApp({ onSwitch }) {
             })}
           </div>
         )}
+
+        {/* Afteller rustend team */}
+        <div style={{ background: "linear-gradient(135deg,#1e3a2e,#1a2530)", borderRadius: 14, padding: "16px", marginBottom: 14, border: "1px solid " + (rustInfo.restMs && rustInfo.restMs < 1800000 ? "rgba(251,191,36,0.4)" : "rgba(74,222,128,0.15)") }}>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>⏱️ Rustend team — tijd tot wissel</div>
+          {rustInfo.volgendWP ? (
+            <div>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 12 }}>
+                <div style={{ fontSize: 44, fontWeight: 700, fontVariantNumeric: "tabular-nums", color: rustInfo.restMs && rustInfo.restMs < 1800000 ? "#fbbf24" : "#4ade80", letterSpacing: "-2px", lineHeight: 1 }}>
+                  {formatAfteller(rustInfo.restMs)}
+                </div>
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>resterend</div>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 10 }}>
+                <div style={{ background: "rgba(0,0,0,0.25)", borderRadius: 10, padding: "8px", textAlign: "center" }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "white" }}>Team {rustInfo.lopendTeam === "A" ? "B" : "A"}</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>rust nu</div>
+                </div>
+                <div style={{ background: "rgba(0,0,0,0.25)", borderRadius: 10, padding: "8px", textAlign: "center" }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#4ade80" }}>{rustInfo.snelheid.toFixed(1)} km/h</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>team {rustInfo.lopendTeam}</div>
+                </div>
+                <div style={{ background: "rgba(0,0,0,0.25)", borderRadius: 10, padding: "8px", textAlign: "center" }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "white" }}>{formatEta(rustInfo.etaMs) || "—"}</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>ETA wissel</div>
+                </div>
+              </div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", textAlign: "center" }}>
+                📍 {rustInfo.volgendWP.naam} · {rustInfo.volgendWP.km} km
+              </div>
+              {rustInfo.restMs && rustInfo.restMs < 1800000 && (
+                <div style={{ marginTop: 8, padding: "8px 12px", background: "rgba(251,191,36,0.15)", borderRadius: 8, fontSize: 12, color: "#fbbf24", textAlign: "center", fontWeight: 600 }}>
+                  ⚠️ Minder dan 30 min tot wissel — maak je klaar!
+                </div>
+              )}
+            </div>
+          ) : (
+            <div style={{ textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: 13, padding: "8px 0" }}>
+              Bevestig eerst een checkpoint om de afteller te starten
+            </div>
+          )}
+        </div>
+
         <div style={{ textAlign: "center" }}>
           <button onClick={onSwitch} style={{ background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 99, padding: "8px 20px", fontSize: 13, color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>👀 Supporter-tracker</button>
         </div>
       </div>
+
       {toast && <div style={{ position: "fixed", bottom: 30, left: "50%", transform: "translateX(-50%)", background: "#16a34a", color: "white", padding: "12px 24px", borderRadius: 99, fontSize: 14, fontWeight: 600, zIndex: 100, whiteSpace: "nowrap" }}>{toast}</div>}
     </div>
   );
@@ -1516,40 +1546,18 @@ function SupportersBlog({ supporters, scriptUrl }) {
     const supUrl = scriptUrl + "?type=supporter&naam=" + encodeURIComponent(naam.trim()) + "&bericht=" + encodeURIComponent(bericht.trim()) + "&timestamp=" + encodeURIComponent(new Date().toISOString());
     fetch(supUrl)
       .then(function(r) { return r.json(); })
-      .then(function() {
-        showToast("✓ Bericht geplaatst!");
-        setBericht("");
-        setLoading(false);
-      })
-      .catch(function() {
-        setFout("Versturen mislukt — probeer opnieuw");
-        setLoading(false);
-      });
+      .then(function() { showToast("✓ Bericht geplaatst!"); setBericht(""); setLoading(false); })
+      .catch(function() { setFout("Versturen mislukt — probeer opnieuw"); setLoading(false); });
   }
 
   return (
     <div style={{ padding: "14px 16px 0" }}>
       <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>💙 Supporters</div>
-
-      {/* Invoer formulier */}
       <div style={{ background: "#1a2530", borderRadius: 14, padding: "14px", marginBottom: 10 }}>
         <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 10 }}>Laat een bericht achter voor het team!</div>
-        <input
-          value={naam}
-          onChange={function(e) { setNaam(e.target.value); setFout(""); }}
-          placeholder="Jouw naam *"
-          maxLength={50}
-          style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: fout && !naam.trim() ? "1px solid #f87171" : "1px solid rgba(255,255,255,0.1)", background: "#0f1923", color: "white", fontSize: 14, outline: "none", fontFamily: "inherit", marginBottom: 8 }}
-        />
+        <input value={naam} onChange={function(e) { setNaam(e.target.value); setFout(""); }} placeholder="Jouw naam *" maxLength={50} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: fout && !naam.trim() ? "1px solid #f87171" : "1px solid rgba(255,255,255,0.1)", background: "#0f1923", color: "white", fontSize: 14, outline: "none", fontFamily: "inherit", marginBottom: 8 }} />
         <div style={{ position: "relative" }}>
-          <textarea
-            value={bericht}
-            onChange={function(e) { setBericht(e.target.value); setFout(""); }}
-            placeholder="Typ je bericht... 💪🏃‍♂️🎉"
-            maxLength={280}
-            rows={3}
-            style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: fout && !bericht.trim() ? "1px solid #f87171" : "1px solid rgba(255,255,255,0.1)", background: "#0f1923", color: "white", fontSize: 14, outline: "none", fontFamily: "inherit", resize: "none" }}
-          />
+          <textarea value={bericht} onChange={function(e) { setBericht(e.target.value); setFout(""); }} placeholder="Typ je bericht... 💪🏃‍♂️🎉" maxLength={280} rows={3} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: fout && !bericht.trim() ? "1px solid #f87171" : "1px solid rgba(255,255,255,0.1)", background: "#0f1923", color: "white", fontSize: 14, outline: "none", fontFamily: "inherit", resize: "none" }} />
           <span style={{ position: "absolute", bottom: 8, right: 10, fontSize: 10, color: bericht.length > 250 ? "#f87171" : "rgba(255,255,255,0.25)" }}>{bericht.length}/280</span>
         </div>
         {fout && <div style={{ fontSize: 12, color: "#f87171", marginTop: 6 }}>{fout}</div>}
@@ -1557,8 +1565,6 @@ function SupportersBlog({ supporters, scriptUrl }) {
           {loading ? "Versturen…" : "💙 Stuur bericht"}
         </button>
       </div>
-
-      {/* Berichten lijst */}
       {supporters.length === 0 ? (
         <div style={{ background: "#1a2530", borderRadius: 14, padding: "16px", fontSize: 13, color: "rgba(255,255,255,0.3)", textAlign: "center" }}>Nog geen supporter berichten — wees de eerste!</div>
       ) : (
@@ -1579,7 +1585,6 @@ function SupportersBlog({ supporters, scriptUrl }) {
           })}
         </div>
       )}
-
       {toast && <div style={{ position: "fixed", bottom: 30, left: "50%", transform: "translateX(-50%)", background: "#1d4ed8", color: "white", padding: "12px 24px", borderRadius: 99, fontSize: 14, fontWeight: 600, zIndex: 100, whiteSpace: "nowrap" }}>{toast}</div>}
     </div>
   );
@@ -1589,7 +1594,6 @@ function SupportersBlog({ supporters, scriptUrl }) {
 function SupporterTracker({ onSwitch }) {
   const [checkpoints, setCheckpoints] = useState([]);
   const [gpsData, setGpsData] = useState(null);
-  const [teamLog, setTeamLog] = useState([]);
   const [supporters, setSupporters] = useState([]);
   const [lastUpdate, setLastUpdate] = useState(null);
   const [filter, setFilter] = useState("belangrijk");
@@ -1612,21 +1616,16 @@ function SupporterTracker({ onSwitch }) {
         } else {
           setCheckpoints([]);
         }
-        // GPS data verwerken
-        if (data.gps && data.gps.lat) {
-          setGpsData(data.gps);
-        } else {
-          setGpsData(null);
-        }
-        // Team logboek
-        if (data.team_log) setTeamLog(data.team_log);
-        // Supporters
+        if (data.gps && data.gps.lat) setGpsData(data.gps); else setGpsData(null);
         if (data.supporters) setSupporters(data.supporters);
         setLastUpdate(new Date());
       }).catch(function() {});
   }
 
-  // GPS status bepalen
+  const huidigKm = checkpoints.length > 0 ? Math.max.apply(null, checkpoints.map(function(c) { return c.km; })) : 0;
+  const pct = Math.min(100, Math.round((huidigKm / TOTAL_KM) * 100));
+
+  // GPS status
   const gpsStatus = (function() {
     if (!gpsData || !gpsData.lat) return "geen";
     const oud = (Date.now() - new Date(gpsData.timestamp).getTime()) / 60000;
@@ -1635,24 +1634,44 @@ function SupporterTracker({ onSwitch }) {
     return "oud";
   })();
 
-  // Effectieve km positie: GPS heeft voorrang op checkpoint
-  const checkpointKm = checkpoints.length > 0 ? Math.max.apply(null, checkpoints.map(function(c) { return c.km; })) : 0;
   const gpsKm = (gpsData && gpsData.km) ? parseFloat(gpsData.km) : 0;
-  const huidigKm = (gpsStatus === "live" || gpsStatus === "vertraagd") ? Math.max(gpsKm, checkpointKm) : checkpointKm;
   const gebruiktGPS = gpsStatus === "live" || gpsStatus === "vertraagd";
-  const pct = Math.min(100, Math.round((huidigKm / TOTAL_KM) * 100));
+  const effectiefKm = gebruiktGPS ? Math.max(gpsKm, huidigKm) : huidigKm;
 
-  let snelheid = DEFAULT_SPEED;
-  if (checkpoints.length >= 2) {
-    const sorted = checkpoints.slice().sort(function(a,b) { return a.km - b.km; });
-    const dtMs = new Date(sorted[sorted.length-1].timestamp) - new Date(sorted[0].timestamp);
-    const dKm = sorted[sorted.length-1].km - sorted[0].km;
-    if (dtMs > 0 && dKm > 0) snelheid = dKm / (dtMs / 3600000);
+  // Snelheid berekening - realtime huidige shift
+  const gesorteerdeCP = checkpoints.slice().sort(function(a,b) { return a.km - b.km; });
+
+  // Bepaal lopend team
+  const laatsteCP = gesorteerdeCP.length > 0 ? gesorteerdeCP[gesorteerdeCP.length-1] : null;
+  const huidigWP = laatsteCP ? WISSELPUNTEN.reduce(function(best, wp) {
+    return Math.abs(wp.km - laatsteCP.km) < Math.abs(best.km - laatsteCP.km) ? wp : best;
+  }, WISSELPUNTEN[0]) : WISSELPUNTEN[0];
+  const lopendTeam = (huidigWP && huidigWP.team && huidigWP.team.includes("A→B")) ? "B" : "A";
+
+  // Realtime snelheid huidige shift
+  let snelheidNu = DEFAULT_SPEED;
+  if (gesorteerdeCP.length > 0) {
+    const shiftStart = gesorteerdeCP[gesorteerdeCP.length-1];
+    const dKm = effectiefKm - shiftStart.km;
+    const dtMs = Date.now() - new Date(shiftStart.timestamp).getTime();
+    if (dKm > 0.3 && dtMs > 60000) snelheidNu = dKm / (dtMs / 3600000);
   }
 
-  const huidigPunt = ROUTE.filter(function(p) { return p.km <= huidigKm; }).slice(-1)[0] || ROUTE[0];
-  const volgendWP = ROUTE.filter(function(p) { return ["wp","finish"].includes(p.type) && p.km > huidigKm; })[0];
-  const looptijdMs = huidigKm > 0 ? Date.now() - STARTMS : 0;
+  // Gemiddelde snelheid per team voor finish ETA
+  let snelheidFinish = DEFAULT_SPEED;
+  if (gesorteerdeCP.length >= 2) {
+    let totaal = 0, aantal = 0;
+    for (let i = 1; i < gesorteerdeCP.length; i++) {
+      const dtMs = new Date(gesorteerdeCP[i].timestamp) - new Date(gesorteerdeCP[i-1].timestamp);
+      const dKm = gesorteerdeCP[i].km - gesorteerdeCP[i-1].km;
+      if (dtMs > 0 && dKm > 0.5) { totaal += dKm / (dtMs / 3600000); aantal++; }
+    }
+    if (aantal > 0) snelheidFinish = totaal / aantal;
+  }
+
+  const huidigPunt = ROUTE.filter(function(p) { return p.km <= effectiefKm; }).slice(-1)[0] || ROUTE[0];
+  const volgendWP = WISSELPUNTEN.find(function(p) { return p.km > effectiefKm; });
+  const looptijdMs = effectiefKm > 0 ? Date.now() - STARTMS : 0;
 
   const toonTypes = {
     belangrijk: ["start","wp","finish","cp"],
@@ -1675,46 +1694,45 @@ function SupporterTracker({ onSwitch }) {
 
   return (
     <div style={{ fontFamily: "-apple-system,sans-serif", background: "#0f1923", minHeight: "100vh", color: "white", maxWidth: 430, margin: "0 auto", paddingBottom: 40 }}>
+
+      {/* Header */}
       <div style={{ background: "linear-gradient(135deg,#0a1f2e,#0f2a1a)", padding: "44px 20px 16px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
           <div>
             <div style={{ fontSize: 11, color: "#4ade80", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 4 }}>HW-Runners · Live</div>
-            <div style={{ fontSize: 22, fontWeight: 700 }}>Roparun 2026</div>
+            <div style={{ fontSize: 22, fontWeight: 700 }}>Roparun 2026 🏃</div>
           </div>
           <div style={{ textAlign: "right" }}>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{lastUpdate ? pad(lastUpdate.getHours()) + ":" + pad(lastUpdate.getMinutes()) : "—"}</div>
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#4ade80", marginTop: 4, marginLeft: "auto", animation: "pulse 2s infinite" }} />
           </div>
         </div>
+
+        {/* Progress */}
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 5 }}>
-          <span>Clastres</span>
-          <span style={{ color: "#4ade80", fontWeight: 600 }}>{pct}% · {huidigKm} km</span>
-          <span>Rotterdam</span>
+          <span>Clastres</span><span style={{ color: "#4ade80", fontWeight: 600 }}>{pct}% · {effectiefKm} km</span><span>Rotterdam</span>
         </div>
         <div style={{ height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 3, overflow: "hidden" }}>
           <div style={{ height: "100%", width: pct + "%", background: "linear-gradient(90deg,#16a34a,#4ade80)", borderRadius: 3, transition: "width 0.8s" }} />
         </div>
 
-        {/* GPS Status indicator */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, padding: "8px 12px", background: gpsStatus === "live" ? "rgba(74,222,128,0.15)" : gpsStatus === "vertraagd" ? "rgba(251,191,36,0.15)" : checkpointKm > 0 ? "rgba(59,130,246,0.15)" : "rgba(255,255,255,0.05)", borderRadius: 10, border: "1px solid " + (gpsStatus === "live" ? "rgba(74,222,128,0.4)" : gpsStatus === "vertraagd" ? "rgba(251,191,36,0.4)" : checkpointKm > 0 ? "rgba(59,130,246,0.4)" : "rgba(255,255,255,0.1)") }}>
-          <div style={{ width: 10, height: 10, borderRadius: "50%", flexShrink: 0, background: gpsStatus === "live" ? "#4ade80" : gpsStatus === "vertraagd" ? "#fbbf24" : checkpointKm > 0 ? "#3b82f6" : "#6b7280", animation: gpsStatus === "live" ? "pulse 2s infinite" : "none" }} />
-          <span style={{ fontSize: 12, fontWeight: 600, flex: 1, color: gpsStatus === "live" ? "#4ade80" : gpsStatus === "vertraagd" ? "#fbbf24" : checkpointKm > 0 ? "#3b82f6" : "rgba(255,255,255,0.4)" }}>
-            {gpsStatus === "live" ? "🛰️ GPS Live — Traccar actief" : gpsStatus === "vertraagd" ? "⚠️ GPS Vertraagd — laatste update > 10 min" : checkpointKm > 0 ? "📍 Checkpoint — geen GPS beschikbaar" : "⚪ Wachten op data…"}
+        {/* GPS Status */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, padding: "8px 12px", background: gpsStatus === "live" ? "rgba(74,222,128,0.15)" : gpsStatus === "vertraagd" ? "rgba(251,191,36,0.15)" : huidigKm > 0 ? "rgba(59,130,246,0.15)" : "rgba(255,255,255,0.05)", borderRadius: 10, border: "1px solid " + (gpsStatus === "live" ? "rgba(74,222,128,0.4)" : gpsStatus === "vertraagd" ? "rgba(251,191,36,0.4)" : huidigKm > 0 ? "rgba(59,130,246,0.4)" : "rgba(255,255,255,0.1)") }}>
+          <div style={{ width: 10, height: 10, borderRadius: "50%", flexShrink: 0, background: gpsStatus === "live" ? "#4ade80" : gpsStatus === "vertraagd" ? "#fbbf24" : huidigKm > 0 ? "#3b82f6" : "#6b7280", animation: gpsStatus === "live" ? "pulse 2s infinite" : "none" }} />
+          <span style={{ fontSize: 12, fontWeight: 600, flex: 1, color: gpsStatus === "live" ? "#4ade80" : gpsStatus === "vertraagd" ? "#fbbf24" : huidigKm > 0 ? "#3b82f6" : "rgba(255,255,255,0.4)" }}>
+            {gpsStatus === "live" ? "🛰️ GPS Live — Traccar actief" : gpsStatus === "vertraagd" ? "⚠️ GPS Vertraagd" : huidigKm > 0 ? "📍 Checkpoint — geen GPS" : "⚪ Wachten op data…"}
           </span>
-          {gpsData && gpsData.timestamp && (
-            <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", flexShrink: 0 }}>
-              {Math.round((Date.now() - new Date(gpsData.timestamp).getTime()) / 60000) < 1 ? "zojuist" : Math.round((Date.now() - new Date(gpsData.timestamp).getTime()) / 60000) + " min"}
-            </span>
-          )}
+          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", flexShrink: 0 }}>{effectiefKm} km</span>
         </div>
       </div>
 
+      {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, padding: "12px 16px 0" }}>
         {[
-          { val: huidigKm, sub: "/" + TOTAL_KM + "km", lbl: "Afstand" },
-          { val: snelheid.toFixed(1), sub: "km/h", lbl: "Snelheid" },
+          { val: effectiefKm, sub: "/" + TOTAL_KM + "km", lbl: "Afstand" },
+          { val: snelheidNu.toFixed(1), sub: "km/h · " + lopendTeam, lbl: "Snelheid" },
           { val: formatDuur(looptijdMs), sub: "", lbl: "Onderweg" },
-          { val: checkpoints.length > 0 ? (formatEta(calcEtaMs(huidigKm, TOTAL_KM, snelheid)) || "—") : "ma ~14:24", sub: "finish", lbl: "ETA" },
+          { val: checkpoints.length > 0 ? (formatEta(calcEtaMs(effectiefKm, TOTAL_KM, snelheidFinish)) || "—") : "ma ~14:24", sub: "finish", lbl: "ETA" },
         ].map(function(s, i) {
           return (
             <div key={i} style={{ background: "#1a2530", borderRadius: 12, padding: "10px 8px", textAlign: "center" }}>
@@ -1726,6 +1744,7 @@ function SupporterTracker({ onSwitch }) {
         })}
       </div>
 
+      {/* Nu / Volgend */}
       <div style={{ padding: "10px 16px 0", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
         <div style={{ background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.2)", borderRadius: 12, padding: "12px 14px" }}>
           <div style={{ fontSize: 10, color: "#4ade80", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 3 }}>Nu bij</div>
@@ -1736,13 +1755,15 @@ function SupporterTracker({ onSwitch }) {
           <div style={{ background: "#1a2530", borderRadius: 12, padding: "12px 14px" }}>
             <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 3 }}>Volgend WP</div>
             <div style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.3 }}>{volgendWP.naam.split("–").pop().trim()}</div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>{checkpoints.length > 0 ? (formatEta(calcEtaMs(huidigKm, volgendWP.km, snelheid)) || volgendWP.tijd) : volgendWP.tijd}</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>{checkpoints.length > 0 ? (formatEta(calcEtaMs(effectiefKm, volgendWP.km, snelheidNu)) || volgendWP.tijd) : volgendWP.tijd}</div>
           </div>
         )}
       </div>
 
-      <RouteKaart huidigKm={huidigKm} snelheid={snelheid} gpsData={gebruiktGPS ? gpsData : null} />
+      {/* Kaart */}
+      <RouteKaart huidigKm={effectiefKm} snelheid={snelheidNu} gpsData={gebruiktGPS ? gpsData : null} />
 
+      {/* Filter + zoek */}
       <div style={{ padding: "14px 16px 0" }}>
         <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
           {[["belangrijk","WP + CP"],["steden","Steden"],["rbr","RBR"],["doorkomsten","Doorkomsten"],["alles","Alles"]].map(function(item) {
@@ -1754,16 +1775,17 @@ function SupporterTracker({ onSwitch }) {
         <input value={zoek} onChange={function(e) { setZoek(e.target.value); }} placeholder="Zoek plaats…" style={{ width: "100%", padding: "9px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "#1a2530", color: "white", fontSize: 14, outline: "none", fontFamily: "inherit", marginBottom: 10 }} />
       </div>
 
+      {/* Route lijst */}
       <div style={{ padding: "0 16px" }}>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>Route · {zichtbaar.length} punten</div>
         <div style={{ background: "#1a2530", borderRadius: 14, overflow: "hidden" }}>
           {zichtbaar.map(function(p, i) {
             const s = STIJL[p.type] || STIJL.door;
             const isWP = ["start","wp","finish"].includes(p.type);
-            const gepasseerd = checkpoints.length > 0 && p.km <= huidigKm;
+            const gepasseerd = checkpoints.length > 0 && p.km <= effectiefKm;
             const isNu = p.km === huidigPunt.km;
             const werkelijk = checkpoints.find(function(c) { return c.naam === p.naam; });
-            const eta = checkpoints.length > 0 && !gepasseerd ? formatEta(calcEtaMs(huidigKm, p.km, snelheid)) : null;
+            const eta = checkpoints.length > 0 && !gepasseerd ? formatEta(calcEtaMs(effectiefKm, p.km, snelheidNu)) : null;
             return (
               <div key={i} style={{ padding: isWP ? "13px 16px" : "8px 16px", borderBottom: i < zichtbaar.length-1 ? "1px solid rgba(255,255,255," + (isWP ? "0.08" : "0.04") + ")" : "none", display: "flex", alignItems: "center", gap: 10, background: isNu ? "rgba(74,222,128,0.06)" : isWP ? "rgba(255,255,255,0.01)" : "transparent" }}>
                 <div style={{ width: isWP ? 28 : 18, height: isWP ? 28 : 18, borderRadius: "50%", flexShrink: 0, background: gepasseerd ? (isWP ? "#16a34a" : "rgba(74,222,128,0.15)") : "#1e3a2e", border: isNu ? "2px solid " + s.kleur : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: isWP ? 12 : 9 }}>
@@ -1788,6 +1810,7 @@ function SupporterTracker({ onSwitch }) {
         </div>
       </div>
 
+      {/* Legenda */}
       <div style={{ padding: "12px 16px 0" }}>
         <div style={{ background: "#1a2530", borderRadius: 12, padding: "10px 14px", display: "flex", flexWrap: "wrap", gap: "5px 12px" }}>
           {Object.entries(STIJL).map(function(entry) {
@@ -1800,13 +1823,11 @@ function SupporterTracker({ onSwitch }) {
         </div>
       </div>
 
-      {/* Website + Donatie buttons boven berichten */}
+      {/* Website + Donatie */}
       <div style={{ padding: "20px 16px 0" }}>
-        
-        {/* Website button met logo */}
         <a href="https://www.hwrunners.nl" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", display: "block", marginBottom: 10 }}>
           <div style={{ background: "#1a2530", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 14, padding: "14px 18px", display: "flex", alignItems: "center", gap: 14 }}>
-            <img src="data:image/png;base64,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" alt="HW Runners" style={{ width: 56, height: 56, objectFit: "contain", background: "white", borderRadius: 10, padding: 4, flexShrink: 0 }} />
+            <img src={HW_LOGO} alt="HW Runners" style={{ width: 56, height: 56, objectFit: "contain", background: "white", borderRadius: 10, padding: 4, flexShrink: 0 }} />
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 2 }}>HW-Runners</div>
               <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.4 }}>Bezoek onze website voor meer updates en teaminfo</div>
@@ -1814,17 +1835,13 @@ function SupporterTracker({ onSwitch }) {
             <span style={{ fontSize: 18, color: "rgba(255,255,255,0.3)" }}>→</span>
           </div>
         </a>
-
-        {/* Donatie button */}
         <a href="https://www.roparun.nl/teams/hwrunners/donate" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", display: "block" }}>
-          <div style={{ background: "linear-gradient(135deg, #dc2626, #ef4444)", borderRadius: 16, padding: "20px", textAlign: "center", boxShadow: "0 8px 30px rgba(220,38,38,0.35)", position: "relative", overflow: "hidden" }}>
+          <div style={{ background: "linear-gradient(135deg,#dc2626,#ef4444)", borderRadius: 16, padding: "20px", textAlign: "center", boxShadow: "0 8px 30px rgba(220,38,38,0.35)", position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: -20, right: -20, fontSize: 80, opacity: 0.08 }}>❤️</div>
             <div style={{ fontSize: 26, marginBottom: 6 }}>❤️</div>
             <div style={{ fontSize: 18, fontWeight: 700, color: "white", marginBottom: 4 }}>Steun ons team!</div>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,0.85)", marginBottom: 14, lineHeight: 1.4 }}>Samen in actie voor palliatieve zorg bij kanker</div>
-            <div style={{ background: "white", color: "#dc2626", fontWeight: 700, fontSize: 15, padding: "10px 28px", borderRadius: 99, display: "inline-block" }}>
-              💛 Doneer nu
-            </div>
+            <div style={{ background: "white", color: "#dc2626", fontWeight: 700, fontSize: 15, padding: "10px 28px", borderRadius: 99, display: "inline-block" }}>💛 Doneer nu</div>
           </div>
         </a>
       </div>
@@ -1832,9 +1849,11 @@ function SupporterTracker({ onSwitch }) {
       {/* Supporters blog */}
       <SupportersBlog supporters={supporters} scriptUrl={SCRIPT_URL} />
 
-      <div style={{ textAlign: "center", marginTop: 16, paddingBottom: 8 }}>
+      <div style={{ textAlign: "center", marginTop: 20, paddingBottom: 8 }}>
         <button onClick={onSwitch} style={{ background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 99, padding: "8px 20px", fontSize: 13, color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>Team app</button>
       </div>
+
+      <style>{"@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}"}</style>
     </div>
   );
 }
