@@ -1104,7 +1104,7 @@ const GPX_ROUTE = [
 ];
 
 
-const WISSELPUNTEN = ROUTE.filter(p => ["start","wp","finish"].includes(p.type));
+const WISSELPUNTEN = ROUTE.filter(function(p) { return ["start","wp","finish"].includes(p.type); });
 
 function pad(n) { return String(n).padStart(2, "0"); }
 
@@ -1354,12 +1354,29 @@ function TeamApp({ onSwitch }) {
   const [toast, setToast] = useState("");
   const [filter, setFilter] = useState("wp");
   const [zoek, setZoek] = useState("");
+  const [tracking, setTracking] = useState(null);
+  const [trackingLoading, setTrackingLoading] = useState(false);
 
   if (!ingelogd) return <PinScherm onSuccess={function() { setIngelogd(true); }} />;
 
   function nowStr() { return new Date().toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit", second: "2-digit" }); }
   function addLog(msg, t) { setLog(function(p) { return [{ msg: msg, t: t, time: nowStr() }, ...p].slice(0, 10); }); }
   function showToast(msg) { setToast(msg); setTimeout(function() { setToast(""); }, 3000); }
+
+  function toggleTracking(aan) {
+    setTrackingLoading(true);
+    fetch(SCRIPT_URL + "?type=" + (aan ? "tracking_aan" : "tracking_uit"))
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        setTracking(data.tracking);
+        showToast(aan ? "✓ GPS tracking gestart!" : "⏹ GPS tracking gestopt");
+        setTrackingLoading(false);
+      })
+      .catch(function() {
+        showToast("Mislukt — probeer opnieuw");
+        setTrackingLoading(false);
+      });
+  }
 
   function bevestig() {
     if (!sel) { showToast("Kies eerst een punt"); return; }
@@ -1404,6 +1421,28 @@ function TeamApp({ onSwitch }) {
             <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>Geef door bij welk punt je bent</div>
           </div>
           <button onClick={function() { setIngelogd(false); }} style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 99, padding: "6px 12px", color: "rgba(255,255,255,0.4)", fontSize: 12, cursor: "pointer" }}>🔒 Slot</button>
+        </div>
+        
+        {/* GPS Tracking aan/uit */}
+        <div style={{ marginTop: 14, padding: "12px 14px", background: tracking === "AAN" ? "rgba(74,222,128,0.1)" : "rgba(255,255,255,0.05)", borderRadius: 12, border: "1px solid " + (tracking === "AAN" ? "rgba(74,222,128,0.3)" : "rgba(255,255,255,0.1)"), display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ width: 10, height: 10, borderRadius: "50%", background: tracking === "AAN" ? "#4ade80" : "#6b7280", flexShrink: 0, animation: tracking === "AAN" ? "pulse 2s infinite" : "none" }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: tracking === "AAN" ? "#4ade80" : "rgba(255,255,255,0.5)" }}>
+              {tracking === "AAN" ? "🛰️ GPS Tracking actief" : "⏸ GPS Tracking gestopt"}
+            </div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginTop: 2 }}>
+              {tracking === "AAN" ? "Elke 5 min wordt GPS opgehaald van Traccar" : "Traccar GPS wordt niet opgehaald"}
+            </div>
+          </div>
+          {tracking !== "AAN" ? (
+            <button onClick={function() { toggleTracking(true); }} disabled={trackingLoading} style={{ padding: "8px 14px", borderRadius: 99, border: "none", background: trackingLoading ? "#1a2530" : "#16a34a", color: "white", fontSize: 12, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}>
+              {trackingLoading ? "…" : "▶ Start"}
+            </button>
+          ) : (
+            <button onClick={function() { toggleTracking(false); }} disabled={trackingLoading} style={{ padding: "8px 14px", borderRadius: 99, border: "none", background: trackingLoading ? "#1a2530" : "#dc2626", color: "white", fontSize: 12, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}>
+              {trackingLoading ? "…" : "⏹ Stop"}
+            </button>
+          )}
         </div>
       </div>
 
