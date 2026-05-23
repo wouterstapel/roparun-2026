@@ -1198,19 +1198,11 @@ function RouteKaart({ huidigKm, snelheid, gpsData }) {
   }
 
   useEffect(function() {
-    if (animTimerRef.current) { clearInterval(animTimerRef.current); animTimerRef.current = null; }
     if (huidigKm <= 0) return;
-    animKmRef.current = huidigKm;
     updateKaart(huidigKm);
     const pos = kmNaarCoord(huidigKm);
     if (pos && kaartRef.current) kaartRef.current.setView(pos, 12);
-    const stapKm = (snelheid || 11) / 360;
-    animTimerRef.current = setInterval(function() {
-      animKmRef.current = Math.min(animKmRef.current + stapKm, TOTAL_KM);
-      updateKaart(animKmRef.current);
-    }, 10000);
-    return function() { if (animTimerRef.current) clearInterval(animTimerRef.current); };
-  }, [huidigKm, snelheid, gpsData]);
+  }, [huidigKm, gpsData]);
 
   return (
     <div style={{ margin: "12px 16px 0", borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255,255,255,0.1)" }}>
