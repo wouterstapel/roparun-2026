@@ -1191,10 +1191,14 @@ function RouteKaart({ huidigKm, snelheid, gpsData }) {
   }
 
   useEffect(function() {
-    if (huidigKm <= 0) return;
     updateKaart(huidigKm);
-    const pos = kmNaarCoord(huidigKm);
-    if (pos && kaartRef.current) kaartRef.current.setView(pos, 12);
+    // Centreer altijd op GPS positie als beschikbaar
+    if (gpsData && gpsData.lat && gpsData.lon && kaartRef.current) {
+      kaartRef.current.setView([parseFloat(gpsData.lat), parseFloat(gpsData.lon)], 13);
+    } else if (huidigKm > 0) {
+      const pos = kmNaarCoord(huidigKm);
+      if (pos && kaartRef.current) kaartRef.current.setView(pos, 12);
+    }
   }, [huidigKm, gpsData]);
 
   return (
