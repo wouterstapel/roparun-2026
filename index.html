@@ -1175,13 +1175,6 @@ function RouteKaart({ huidigKm, snelheid, gpsData }) {
     if (!kaartRef.current) return;
     const map = kaartRef.current;
     if (gereenRef.current) { map.removeLayer(gereenRef.current); gereenRef.current = null; }
-    if (km > 0) {
-      const n = Math.min(Math.round((km / TOTAL_KM) * GPX_ROUTE.length) + 1, GPX_ROUTE.length);
-      const gereden = GPX_ROUTE.slice(0, n);
-      if (gereden.length > 1) {
-        gereenRef.current = L.polyline(gereden, { color: "#4ade80", weight: 4, opacity: 0.9 }).addTo(map);
-      }
-    }
     if (markerRef.current) { map.removeLayer(markerRef.current); markerRef.current = null; }
     if (km > 0) {
       const isExactGPS = gpsData && gpsData.lat;
@@ -1210,7 +1203,7 @@ function RouteKaart({ huidigKm, snelheid, gpsData }) {
         <span>Route kaart · exacte GPX route</span>
         <span style={{ marginLeft: "auto", display: "flex", gap: 10, alignItems: "center" }}>
           <span style={{ display: "flex", gap: 4, alignItems: "center" }}><span style={{ width: 12, height: 3, background: "#3b82f6", display: "inline-block", borderRadius: 2 }}></span><span>Route</span></span>
-          <span style={{ display: "flex", gap: 4, alignItems: "center" }}><span style={{ width: 12, height: 3, background: "#4ade80", display: "inline-block", borderRadius: 2 }}></span><span>Gereden</span></span>
+
         </span>
       </div>
       <div ref={mapRef} style={{ height: 300, width: "100%" }} />
@@ -1344,9 +1337,21 @@ function TeamApp({ onSwitch }) {
 
     // Realtime snelheid huidige shift
     const shiftStart = cps[cps.length-1];
-    const dKm = effectiefKm - shiftStart.km;
-    const dtMs = nu - new Date(shiftStart.timestamp).getTime();
-    const snelheid = (dKm > 0.3 && dtMs > 60000) ? dKm / (dtMs / 3600000) : DEFAULT_SPEED;
+    const gpsKmWaarde = (liveData.gps && liveData.gps.km) ? parseFloat(liveData.gps.km) : effectiefKm;
+    const tienMinMs = 10 * 60 * 1000;
+    const oudCP = cps.slice().reverse().find(function(cp) {
+      return (nu - new Date(cp.timestamp).getTime()) >= tienMinMs;
+    });
+    var snelheid = DEFAULT_SPEED;
+    if (oudCP && gpsKmWaarde > 0) {
+      const dKm = gpsKmWaarde - oudCP.km;
+      const dtMs = nu - new Date(oudCP.timestamp).getTime();
+      if (dKm > 0.1 && dtMs > 0) snelheid = dKm / (dtMs / 3600000);
+    } else {
+      const dKm = gpsKmWaarde - shiftStart.km;
+      const dtMs = nu - new Date(shiftStart.timestamp).getTime();
+      if (dKm > 0.1 && dtMs > 60000) snelheid = dKm / (dtMs / 3600000);
+    }
 
     const restKm = volgendWP.km - effectiefKm;
     const restMs = snelheid > 0 ? (restKm / snelheid) * 3600000 : null;
@@ -1640,9 +1645,33 @@ function SupporterTracker({ onSwitch }) {
   }, WISSELPUNTEN[0]) : WISSELPUNTEN[0];
   const lopendTeam = (huidigWP && huidigWP.team && huidigWP.team.includes("A→B")) ? "B" : "A";
 
-  // Realtime snelheid huidige shift
+  // Snelheid op basis van laatste 10 minuten GPS data
   let snelheidNu = DEFAULT_SPEED;
-  if (gesorteerdeCP.length > 0) {
+  if (gpsData && gpsData.timestamp && gpsData.km) {
+    // Zoek GPS punt van ~10 minuten geleden in de data
+    // We hebben alleen het laatste punt dus bereken op basis van checkpoint + GPS
+    const nuMs = Date.now();
+    const gpsMs = new Date(gpsData.timestamp).getTime();
+    const gpsKmWaarde = parseFloat(gpsData.km);
+    
+    // Vind het laatste checkpoint dat meer dan 10 minuten geleden was
+    const tienMinMs = 10 * 60 * 1000;
+    const oudCP = gesorteerdeCP.slice().reverse().find(function(cp) {
+      return (nuMs - new Date(cp.timestamp).getTime()) >= tienMinMs;
+    });
+    
+    if (oudCP) {
+      const dKm = gpsKmWaarde - oudCP.km;
+      const dtMs = nuMs - new Date(oudCP.timestamp).getTime();
+      if (dKm > 0.1 && dtMs > 0) snelheidNu = dKm / (dtMs / 3600000);
+    } else if (gesorteerdeCP.length > 0) {
+      // Gebruik laatste checkpoint als startpunt
+      const shiftStart = gesorteerdeCP[gesorteerdeCP.length-1];
+      const dKm = gpsKmWaarde - shiftStart.km;
+      const dtMs = nuMs - new Date(shiftStart.timestamp).getTime();
+      if (dKm > 0.1 && dtMs > 60000) snelheidNu = dKm / (dtMs / 3600000);
+    }
+  } else if (gesorteerdeCP.length > 0) {
     const shiftStart = gesorteerdeCP[gesorteerdeCP.length-1];
     const dKm = effectiefKm - shiftStart.km;
     const dtMs = Date.now() - new Date(shiftStart.timestamp).getTime();
