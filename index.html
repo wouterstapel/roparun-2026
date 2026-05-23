@@ -1631,9 +1631,10 @@ function SupporterTracker({ onSwitch }) {
     return "oud";
   })();
 
-  const gpsKm = (gpsData && gpsData.km) ? parseFloat(gpsData.km) : 0;
   const gebruiktGPS = gpsStatus === "live" || gpsStatus === "vertraagd";
-  const effectiefKm = gebruiktGPS ? Math.max(gpsKm, huidigKm) : huidigKm;
+  // Km altijd op basis van checkpoints - GPS alleen voor marker op kaart
+  const effectiefKm = huidigKm;
+  const gpsKm = 0; // Negeer GPS km volledig
 
   // Snelheid berekening - realtime huidige shift
   const gesorteerdeCP = checkpoints.slice().sort(function(a,b) { return a.km - b.km; });
@@ -1803,7 +1804,7 @@ function SupporterTracker({ onSwitch }) {
           {zichtbaar.map(function(p, i) {
             const s = STIJL[p.type] || STIJL.door;
             const isWP = ["start","wp","finish"].includes(p.type);
-            const gepasseerd = checkpoints.length > 0 && p.km <= effectiefKm;
+            const gepasseerd = checkpoints.length > 0 && p.km <= huidigKm;
             const isNu = p.km === huidigPunt.km;
             const werkelijk = checkpoints.find(function(c) { return c.naam === p.naam; });
             const eta = checkpoints.length > 0 && !gepasseerd ? formatEta(calcEtaMs(effectiefKm, p.km, snelheidNu)) : null;
