@@ -1341,20 +1341,14 @@ function TeamApp({ onSwitch }) {
 
     // Realtime snelheid huidige shift
     const shiftStart = cps[cps.length-1];
-    const gpsKmWaarde = (liveData.gps && liveData.gps.km) ? parseFloat(liveData.gps.km) : effectiefKm;
-    const tienMinMs = 10 * 60 * 1000;
-    const oudCP = cps.slice().reverse().find(function(cp) {
-      return (nu - new Date(cp.timestamp).getTime()) >= tienMinMs;
-    });
+    // Snelheid op basis van checkpoints
     var snelheid = DEFAULT_SPEED;
-    if (oudCP && gpsKmWaarde > 0) {
-      const dKm = gpsKmWaarde - oudCP.km;
-      const dtMs = nu - new Date(oudCP.timestamp).getTime();
-      if (dKm > 0.1 && dtMs > 0) snelheid = dKm / (dtMs / 3600000);
-    } else {
-      const dKm = gpsKmWaarde - shiftStart.km;
-      const dtMs = nu - new Date(shiftStart.timestamp).getTime();
-      if (dKm > 0.1 && dtMs > 60000) snelheid = dKm / (dtMs / 3600000);
+    if (cps.length >= 2) {
+      const laatste = cps[cps.length-1];
+      const voorlaatste = cps[cps.length-2];
+      const dKm = laatste.km - voorlaatste.km;
+      const dtMs = new Date(laatste.timestamp) - new Date(voorlaatste.timestamp);
+      if (dKm > 0 && dtMs > 0) snelheid = dKm / (dtMs / 3600000);
     }
 
     const restKm = volgendWP.km - effectiefKm;
@@ -1650,37 +1644,14 @@ function SupporterTracker({ onSwitch }) {
   }, WISSELPUNTEN[0]) : WISSELPUNTEN[0];
   const lopendTeam = (huidigWP && huidigWP.team && huidigWP.team.includes("A→B")) ? "B" : "A";
 
-  // Snelheid op basis van laatste 10 minuten GPS data
+  // Snelheid op basis van checkpoints - nooit GPS km
   let snelheidNu = DEFAULT_SPEED;
-  if (gpsData && gpsData.timestamp && gpsData.km) {
-    // Zoek GPS punt van ~10 minuten geleden in de data
-    // We hebben alleen het laatste punt dus bereken op basis van checkpoint + GPS
-    const nuMs = Date.now();
-    const gpsMs = new Date(gpsData.timestamp).getTime();
-    const gpsKmWaarde = parseFloat(gpsData.km);
-    
-    // Vind het laatste checkpoint dat meer dan 10 minuten geleden was
-    const tienMinMs = 10 * 60 * 1000;
-    const oudCP = gesorteerdeCP.slice().reverse().find(function(cp) {
-      return (nuMs - new Date(cp.timestamp).getTime()) >= tienMinMs;
-    });
-    
-    if (oudCP) {
-      const dKm = gpsKmWaarde - oudCP.km;
-      const dtMs = nuMs - new Date(oudCP.timestamp).getTime();
-      if (dKm > 0.1 && dtMs > 0) snelheidNu = dKm / (dtMs / 3600000);
-    } else if (gesorteerdeCP.length > 0) {
-      // Gebruik laatste checkpoint als startpunt
-      const shiftStart = gesorteerdeCP[gesorteerdeCP.length-1];
-      const dKm = gpsKmWaarde - shiftStart.km;
-      const dtMs = nuMs - new Date(shiftStart.timestamp).getTime();
-      if (dKm > 0.1 && dtMs > 60000) snelheidNu = dKm / (dtMs / 3600000);
-    }
-  } else if (gesorteerdeCP.length > 0) {
-    const shiftStart = gesorteerdeCP[gesorteerdeCP.length-1];
-    const dKm = effectiefKm - shiftStart.km;
-    const dtMs = Date.now() - new Date(shiftStart.timestamp).getTime();
-    if (dKm > 0.3 && dtMs > 60000) snelheidNu = dKm / (dtMs / 3600000);
+  if (gesorteerdeCP.length >= 2) {
+    const laatste = gesorteerdeCP[gesorteerdeCP.length-1];
+    const voorlaatste = gesorteerdeCP[gesorteerdeCP.length-2];
+    const dKm = laatste.km - voorlaatste.km;
+    const dtMs = new Date(laatste.timestamp) - new Date(voorlaatste.timestamp);
+    if (dKm > 0 && dtMs > 0) snelheidNu = dKm / (dtMs / 3600000);
   }
 
   // Gemiddelde snelheid per team voor finish ETA
