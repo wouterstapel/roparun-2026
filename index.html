@@ -1341,13 +1341,12 @@ function TeamApp({ onSwitch }) {
 
     // Realtime snelheid huidige shift
     const shiftStart = cps[cps.length-1];
-    // Snelheid op basis van checkpoints
+    // Snelheid op basis van starttijd tot laatste checkpoint
     var snelheid = DEFAULT_SPEED;
-    if (cps.length >= 2) {
+    if (cps.length >= 1) {
       const laatste = cps[cps.length-1];
-      const voorlaatste = cps[cps.length-2];
-      const dKm = laatste.km - voorlaatste.km;
-      const dtMs = new Date(laatste.timestamp) - new Date(voorlaatste.timestamp);
+      const dKm = laatste.km;
+      const dtMs = new Date(laatste.timestamp) - STARTMS;
       if (dKm > 0 && dtMs > 0) snelheid = dKm / (dtMs / 3600000);
     }
 
@@ -1644,13 +1643,12 @@ function SupporterTracker({ onSwitch }) {
   }, WISSELPUNTEN[0]) : WISSELPUNTEN[0];
   const lopendTeam = (huidigWP && huidigWP.team && huidigWP.team.includes("A→B")) ? "B" : "A";
 
-  // Snelheid op basis van checkpoints - nooit GPS km
+  // Snelheid op basis van starttijd tot laatste checkpoint
   let snelheidNu = DEFAULT_SPEED;
-  if (gesorteerdeCP.length >= 2) {
+  if (gesorteerdeCP.length >= 1) {
     const laatste = gesorteerdeCP[gesorteerdeCP.length-1];
-    const voorlaatste = gesorteerdeCP[gesorteerdeCP.length-2];
-    const dKm = laatste.km - voorlaatste.km;
-    const dtMs = new Date(laatste.timestamp) - new Date(voorlaatste.timestamp);
+    const dKm = laatste.km;
+    const dtMs = new Date(laatste.timestamp) - STARTMS;
     if (dKm > 0 && dtMs > 0) snelheidNu = dKm / (dtMs / 3600000);
   }
 
